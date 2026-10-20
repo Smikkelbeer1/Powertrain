@@ -1,0 +1,24 @@
+{
+  "_comment": "Reproduces the original single-file albatros_model_III.py: fixed 40 kg motors, constant propeller efficiency a single L/D and transition power as a fraction of the motor rating.",
+  "motor": {
+    "mass_model": "fixed",
+    "mass_each_kg": [
+      40.0,
+      40.0,
+      40.0,
+      40.0
+    ],
+    "efficiency": 0.9
+  },
+  "propeller": {
+    "model": "constant"
+  },
+  "aerodynamics": {
+    "drag_model": "lift_drag"
+  },
+  "mission": {
+    "transition_power_reference": "rating",
+    "transition_peak_fraction": 1.0,
+    "back_transition_peak_fraction": 0.7
+  }
+}
