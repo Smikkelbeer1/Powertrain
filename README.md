@@ -4,13 +4,14 @@ Conceptual sizing tool for the energy side of a four-rotor eVTOL (two inner
 rotors Ø1.47 m, two outer rotors Ø1.04 m). It takes the aircraft and mission
 data from the other departments and uses them to size:
 
-* **motors**: peak power, peak torque and **mass** (from the HPDM mass–torque fit)
+* **motors**: peak power, peak torque and **mass** (from the HPDM mass–torque fit).
+  The inverter is integrated in the motor by default (`inverter.integrated_in_motor`)
 * **battery**: cells in **series** (from the bus voltage) and in **parallel** (the
   smallest number that flies the mission and every emergency case), total
-  cell count, energy and **mass**
-* **cooling**: eight liquid loops (pumps, hoses, radiators, fans) and their mass
+  cell count, energy, **mass** and **volume**
+* **cooling**: eight liquid loops (pumps, hoses, radiators, fans), with their mass and volume
 * **checks**: temperatures, SOC reserve, cell current and voltage, bus voltage,
-  rotor tip Mach and radiator packaging, shown in a mass budget against MTOW
+  rotor tip Mach and radiator packaging, shown in a mass and volume budget
 
 ## Quick start
 
@@ -29,7 +30,7 @@ python -m pytest                              # run the tests
 
 `python -m albatros --help` lists every option.
 
-**New to the code? Read [docs/HOW_IT_WORKS.md](docs/HOW_IT_WORKS.md).** It
+**New to the code? Read [HOW_IT_WORKS.md](HOW_IT_WORKS.md).** It
 covers every module, a worked 750 kg example, battery sizing in detail, and
 why the code is structured the way it is.
 
@@ -112,7 +113,6 @@ albatros/
   plotting.py      matplotlib plots
   cli.py           command-line interface
 configs/           example input files
-docs/              HOW_IT_WORKS.md: detailed explanation of the code
 tests/             pytest checks (energy conservation, scaling laws, ...)
 ```
 

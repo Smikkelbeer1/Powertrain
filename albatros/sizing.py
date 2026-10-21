@@ -8,7 +8,7 @@ run_model() does, in order:
      case without violating SOC / current / voltage limits (bisection)
   5. cooling loops for that battery              (cooling.design_cooling)
   6. full thermal simulation of the mission and all emergency branches
-  7. mass budget: cells, packaging, BMS, cooling, motors, inverters, avionics
+  7. mass and volume budget: battery, cooling, motors, (inverters), avionics
 """
 from __future__ import annotations
 
@@ -99,6 +99,10 @@ def validate(x: Inputs) -> None:
         raise ValueError("Cooling hover fraction must be in (0,2]")
     if not 0 < z.duty <= 1 or not 1 <= z.simultaneous_per_board <= z.channels_per_board:
         raise ValueError("Invalid balancing duty/channel schedule")
+    if mot.density_kg_m3 <= 0 or c.pump_density_kg_m3 <= 0 or not 0 < b.volume_fill_fraction <= 1:
+        raise ValueError("Motor/pump densities must be positive and battery fill fraction in (0,1]")
+    if min(c.fan_depth_m, x.inverter.volume_each_L, x.auxiliaries.avionics_volume_L) < 0:
+        raise ValueError("Volumes and fan depth must be non-negative")
     if x.inverter.mode not in ("efficiency", "device"):
         raise ValueError("Inverter mode must be efficiency or device")
     for name, value in [("motor efficiency", mot.efficiency), ("prop_eff", p.cruise_prop_eff),
@@ -237,8 +241,25 @@ def run_model(x: Inputs) -> dict[str, Any]:
                      + x.auxiliaries.flight_computer_count * x.auxiliaries.flight_computer_each_kg
                      + x.auxiliaries.voter_kg)
     motors_mass = sum(motors.mass_kg)
-    inverters_mass = 4 * x.inverter.mass_each_kg
+    # An integrated inverter is part of the motor mass (HPDM-type motors).
+    separate_inverters = 0 if x.inverter.integrated_in_motor else 4
+    inverters_mass = separate_inverters * x.inverter.mass_each_kg
     accounted = pack_dry + cooling_mass + motors_mass + inverters_mass + avionics_mass
+
+    # ---- Volume budget [L] -------------------------------------------------
+    # Battery pack envelope = bare cell volume / fill fraction (the rest is
+    # cold plates, BMS, busbars and housing). Cooling parts come from the loop
+    # sizing; motors from mass / assumed density.
+    cells_volume = sum(l.acquisition.get("bare_cell_m3", 0.0) for l in loops) * 1000
+    volume_components: dict[str, float] = {
+        "battery_packs": cells_volume / b.volume_fill_fraction}
+    for l in loops:
+        for k, value in l.volumes_L.items():  # radiator, fan, pump, hoses, reservoir
+            volume_components[k] = volume_components.get(k, 0.0) + value
+    volume_components["motors"] = motors_mass / x.motor.density_kg_m3 * 1000
+    volume_components["inverters"] = separate_inverters * x.inverter.volume_each_L
+    volume_components["avionics"] = x.auxiliaries.avionics_volume_L
+    total_volume = sum(volume_components.values())
 
     # ---- Issues ------------------------------------------------------------
     issues = set(normal.issues)
@@ -256,9 +277,11 @@ def run_model(x: Inputs) -> dict[str, Any]:
         fits = face <= x.cooling.pod_core_face_available_m2 and volume <= x.cooling.pod_core_volume_available_L
         if not fits:
             issues.add("radiator core nacelle allowance exceeded")
+        battery_L = sum(l.acquisition.get("bare_cell_m3", 0.0) for l in podloops) * 1000
         packaging.append(dict(pod=NAMES[i], radiator_face_m2=face, radiator_core_L=volume,
                               fits_core_allowance=fits,
-                              battery_section_cell_count=section_counts(ns)[i] * np))
+                              battery_section_cell_count=section_counts(ns)[i] * np,
+                              battery_section_envelope_L=battery_L / b.volume_fill_fraction))
 
     # ---- Per-motor requirements ------------------------------------------
     requirements: list[dict[str, Any]] = []
@@ -300,9 +323,9 @@ def run_model(x: Inputs) -> dict[str, Any]:
         motors_total_kg=motors_mass, inverters_total_kg=inverters_mass,
         avionics_kg=avionics_mass,
         accounted_subsystems_kg=accounted, remaining_MTOW_kg=a.mass_kg - accounted,
-        battery_bare_volume_L=sum(l.acquisition.get("bare_cell_m3", 0.0) for l in loops) * 1000,
-        battery_pack_envelope_estimate_L=sum(l.acquisition.get("bare_cell_m3", 0.0) for l in loops)
-        * 1000 / b.volume_fill_fraction,
+        battery_bare_volume_L=cells_volume,
+        battery_pack_envelope_estimate_L=volume_components["battery_packs"],
+        volumes_L=volume_components, total_volume_L=total_volume,
         radiator_packaging=packaging, drive_requirements=requirements,
         mission_segments=[asdict(s) for s in segments], mission_rows=normal.rows,
         emergencies=emergencies)

@@ -165,3 +165,20 @@ def test_landing_recovery_turn_back_after_climb():
     assert "cruise" not in r["prefix_phases"]
     # An impossible margin (beyond every limit) must fail, never pass.
     assert not landing_recovery(x, design, max_cruise_s=0, margin_C=500)["feasible"]
+
+
+def test_volume_budget_and_integrated_inverter():
+    x = Inputs()
+    r = run_model(x)
+    v = r["volumes_L"]
+    # Battery envelope = bare cell volume / fill fraction; total = sum of parts.
+    assert math.isclose(v["battery_packs"], r["battery_bare_volume_L"] / x.battery.volume_fill_fraction)
+    assert math.isclose(r["total_volume_L"], sum(v.values()))
+    assert math.isclose(v["radiator"], sum(l["core_m3"] for l in r["cooling_loops"]) * 1000)
+    assert math.isclose(v["motors"], r["motors_total_kg"] / x.motor.density_kg_m3 * 1000)
+    # Integrated inverter: no separate mass, volume or cold plate.
+    assert r["inverters_total_kg"] == 0 and v["inverters"] == 0
+    x.inverter.integrated_in_motor = False
+    separate = run_model(x)
+    assert math.isclose(separate["inverters_total_kg"], 4 * x.inverter.mass_each_kg)
+    assert separate["accounted_subsystems_kg"] > r["accounted_subsystems_kg"]

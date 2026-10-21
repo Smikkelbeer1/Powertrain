@@ -13,7 +13,7 @@ Contents
 5. [Inputs](#5-inputs)
 6. [The physics, file by file](#6-the-physics-file-by-file)
 7. [Battery sizing in detail (series and parallel)](#7-battery-sizing-in-detail-series-and-parallel)
-8. [Mass budget](#8-mass-budget)
+8. [Mass and volume budget](#8-mass-and-volume-budget)
 9. [The issue list: what every warning means](#9-the-issue-list-what-every-warning-means)
 10. [Extra analyses: sweeps, torque mode, landing recovery](#10-extra-analyses-sweeps-torque-mode-landing-recovery)
 11. [Coding design choices and why](#11-coding-design-choices-and-why)
@@ -31,7 +31,8 @@ The tool answers one question:
 > much does it weigh?**
 
 "Powertrain" here means everything that is energy related: the battery
-(including BMS and packaging), the four motors and inverters, the cooling
+(including BMS and packaging), the four motors (with their integrated
+inverters), the cooling
 system and the avionics' power supply. Everything that is *not* energy related
 (MTOW, drag, propeller performance, rotor layout, mission) is delivered by
 other departments and enters the tool as an input.
@@ -42,6 +43,8 @@ Outputs:
   cell count, energy, mass, volume
 * motors: required peak power, peak torque, rpm, phase current and **mass**
 * cooling: eight sized loops (flow, pump, radiator, fan) and their mass
+* a **volume budget**: the volume of the battery packs, radiators, fans,
+  pumps, hoses, reservoirs, motors and avionics
 * a time history of the whole mission (CSV): power, current, voltage, SOC
   and temperatures every 2 seconds
 * a mass budget: how much of the MTOW is left for airframe, rotors and payload
@@ -93,7 +96,7 @@ inputs. The steps are:
               │ 5. size the 8 cooling loops         │  cooling.design_cooling
               │ 6. full simulation incl. temps      │  simulation.simulate
               │    + 24 emergency branches          │
-              │ 7. mass budget + issue list         │  sizing.run_model
+              │ 7. mass + volume budget, issues     │  sizing.run_model
               └────────────────────────────────────┘
                                │
                                ▼
@@ -124,8 +127,10 @@ Default inputs, `python -m albatros --mass 750`:
 | Battery | **190S 25P = 4750 cells**, 77.0 kWh nominal |
 | Cells / battery incl. packaging + BMS | 332.5 kg / 384.1 kg |
 | Motors (4×) | 103.8 kg (inner 29.4 kg, outer 22.5 kg each) |
-| Inverters / cooling / avionics | 16.0 / 111.8 / 7.6 kg |
-| Total powertrain | 623.3 kg → **126.7 kg left** of the 750 kg |
+| Inverters | integrated in the motors (no separate mass) |
+| Cooling / avionics | 109.8 / 7.6 kg |
+| Total powertrain | 605.3 kg → **144.7 kg left** of the 750 kg |
+| Volume: battery packs / radiators / total | 188.0 L / 107.1 L / 444.9 L |
 | Mission energy from battery | 57.0 kWh |
 | Peak battery power / cell current | 418 kW / 27.4 A (limit 45 A) |
 | Why not 24P? | "SOC reserve": a 24P pack ends an emergency case below 20 % |
@@ -173,11 +178,11 @@ subject. Each field has a default value and a unit in its name.
 
 | Section | Main fields |
 |---|---|
-| `motor` | `peak_torque_Nm` (torque mode), `mass_model` (`"family"`/`"fixed"`), `efficiency`, `rating_margin`, thermal data |
+| `motor` | `peak_torque_Nm` (torque mode), `mass_model` (`"family"`/`"fixed"`), `efficiency`, `rating_margin`, `density_kg_m3` (for volume), thermal data |
 | `cell` | capacity, voltages (max 4.2 / nominal 3.6 / min 2.5 V), max current, resistance, mass, size, OCV table |
 | `battery` | bus voltage window, SOC limits, packaging fraction, fixed Ns/Np overrides |
 | `balancing` | passive balancing hardware |
-| `inverter` | efficiency or detailed SiC loss model, mass, thermal data |
+| `inverter` | `integrated_in_motor` (default `True`), efficiency or detailed SiC loss model, mass/volume if separate, thermal data |
 | `auxiliaries` | flight computers, sensors, actuators, DC/DC |
 | `cooling` | coolant, hoses, pumps, radiators, fans, cold plates, available pod space |
 
@@ -391,6 +396,19 @@ battery DC ──► inverter ──► motor ──► shaft
 * The two losses become the heat sources for the motor and inverter in the
   thermal model.
 
+**Integrated inverter.** By default `inverter.integrated_in_motor = True`:
+the inverter is built into the motor housing, as for most motors of this type.
+
+* Its **mass and volume** are part of the motor (the HPDM fit) and are not
+  counted separately.
+* It needs **no separate cold plate**.
+* Its **losses and temperature are still calculated**. The electronics still
+  turn 2 % of the power into heat inside the motor, and that heat still has
+  to go into the cooling loop.
+
+Set it to `False` for a separate inverter box. Then `mass_each_kg`,
+`volume_each_L` and a cold plate per loop are added to the budgets.
+
 **Battery** (`battery_point`): every cell is an ideal voltage source (the
 open-circuit voltage, OCV) in series with a resistor (15 mΩ). For the pack:
 
@@ -443,7 +461,8 @@ It does not affect the flight. The flight simply starts with a 0.2 % spread
 
 **Architecture.** There are 8 independent liquid loops, two per pod:
 
-* **propulsion loop**: radiator → inverter cold plate → motor jacket → back
+* **propulsion loop**: radiator → inverter → motor jacket → back (with an
+  integrated inverter both sit in the same motor housing)
 * **battery loop**: radiator → battery section cold plates → back
 
 **Sizing a loop** (`make_loop`) is a chain:
@@ -680,7 +699,9 @@ still available with `mission.transition_power_reference = "rating"`.
 
 ---
 
-## 8. Mass budget
+## 8. Mass and volume budget
+
+### 8.1 Mass
 
 `run_model` adds up:
 
@@ -689,8 +710,8 @@ still available with `mission.transition_power_reference = "rating"`.
 | Cells | `Ns · Np · cell.mass_kg` |
 | Battery incl. packaging + BMS | cells × (1 + `noncooling_packaging_fraction` 0.15) + balancing hardware |
 | Motors | sum of the four motor masses (HPDM fit) |
-| Inverters | 4 × `inverter.mass_each_kg` |
-| Cooling | sum over the 8 loops: radiator, pump, fan, hoses, coolant, reservoir, fittings, plates, TIM |
+| Inverters | 0 if `integrated_in_motor` (part of the motor mass), else 4 × `inverter.mass_each_kg` |
+| Cooling | sum over the 8 loops: radiator, pump, fan, hoses, coolant, reservoir, fittings, plates (battery only if the inverter is integrated), TIM |
 | Avionics | flight computers + voter + other avionics/actuators |
 
 `remaining_MTOW_kg = MTOW − total`. This is what is left for the airframe,
@@ -701,6 +722,39 @@ rotors, landing gear, payload, etc. If it is negative, the issue
 airframe + payload + powertrain" by itself. To close the loop, sweep MTOW
 (`--sweep`) and pick the MTOW where the remaining mass equals what the other
 departments need.
+
+### 8.2 Volume
+
+`run_model` also builds a volume budget, `volumes_L` (all values in litres,
+outer volume of each part). The totals are printed under `-- Volume budget (L) --`.
+
+| Part | How it is computed | 750 kg example |
+|---|---|---|
+| Battery packs | bare cell volume / `battery.volume_fill_fraction` (0.65). The other 35 % is cold plates, BMS, busbars and housing | 188.0 L (cells alone 122.2 L) |
+| Radiators | sum of the 8 radiator core volumes from the cooling sizing | 107.1 L |
+| Fans | radiator face area × `cooling.fan_depth_m` (fan + shroud) | 89.3 L |
+| Pumps | pump mass / `cooling.pump_density_kg_m3` | 2.3 L |
+| Hoses | supply + return length × outer cross-section | 6.6 L |
+| Reservoirs | coolant reserve per loop | 2.0 L |
+| Motors | motor mass / `motor.density_kg_m3` (3500 kg/m³) | 29.7 L |
+| Inverters | 0 if integrated, else 4 × `inverter.volume_each_L` | 0 L |
+| Avionics | `auxiliaries.avionics_volume_L` (fixed estimate) | 20.0 L |
+| **Total** | | **444.9 L** |
+
+Notes:
+
+* Coolant inside the radiators, hoses and cold plates sits *inside* those
+  parts, so it is not counted twice. Only the reservoir reserve is a separate
+  volume.
+* The **battery and radiator** volumes follow from the sizing (cell geometry,
+  required heat-exchanger size), so they change with the design.
+* **Motor, pump and avionics** volumes use assumed densities or fixed values
+  (placeholders, marked in `inputs.py`). Replace them with supplier data when
+  available.
+* The per-pod table (`radiator_packaging` in the JSON) shows the battery
+  section and radiator core volume per pod. It also says whether the radiators
+  fit in the space available per pod (`cooling.pod_core_face_available_m2`,
+  `pod_core_volume_available_L`).
 
 ---
 
@@ -884,7 +938,8 @@ without breaking anything.
 
 ### 11.14 A legacy config and tests to protect the physics
 
-`configs/legacy_model_III.json` reproduces the original single-file model.
+`configs/legacy_model_III.json` reproduces the original single-file model
+(including separate inverters).
 During the restructuring, every number in the output JSON was compared
 against the original. The largest difference was 2·10⁻¹⁵, which is
 rounding-level.

@@ -68,6 +68,8 @@ def sweep_row(variable: str, value: float, r: dict[str, Any]) -> dict[str, Any]:
             "motors_kg": r["motors_total_kg"],
             "max_rated_torque_Nm": max(d["rated_torque_Nm"] for d in r["drive_requirements"]),
             "cooling_kg": r["cooling_total_kg"], "remaining_kg": r["remaining_MTOW_kg"],
+            "battery_volume_L": r["volumes_L"]["battery_packs"],
+            "radiator_volume_L": r["volumes_L"]["radiator"], "total_volume_L": r["total_volume_L"],
             "mission_kWh": r["nominal_metrics"]["terminal_energy_kWh"],
             "end_soc": r["nominal_metrics"]["end_min_group_soc"],
             "worst_motor_C": r["all_case_metrics"]["peak_motor_C"],
@@ -102,10 +104,24 @@ def print_design(result: dict[str, Any]) -> None:
 
     print("\n-- Mass budget --")
     print(f"Cells {r['battery_cells_kg']:.1f} kg | battery incl packaging/BMS {r['battery_dry_with_BMS_kg']:.1f} kg")
-    print(f"Motors {r['motors_total_kg']:.1f} kg | inverters {r['inverters_total_kg']:.1f} kg | "
+    inverters = ("integrated in motors" if inp["inverter"]["integrated_in_motor"]
+                 else f"{r['inverters_total_kg']:.1f} kg")
+    print(f"Motors {r['motors_total_kg']:.1f} kg | inverters {inverters} | "
           f"cooling {r['cooling_total_kg']:.1f} kg | avionics {r['avionics_kg']:.1f} kg")
     print(f"Total powertrain/systems {r['accounted_subsystems_kg']:.1f} kg | remaining MTOW for "
           f"airframe, rotors, payload etc: {r['remaining_MTOW_kg']:.1f} kg")
+
+    print("\n-- Volume budget (L) --")
+    v = r["volumes_L"]
+    print(f"Battery packs {v['battery_packs']:.1f} (bare cells {r['battery_bare_volume_L']:.1f}) | "
+          f"radiators {v['radiator']:.1f} | fans {v['fan']:.1f} | pumps {v['pump']:.1f}")
+    print(f"Hoses {v['hoses']:.1f} | reservoirs {v['reservoir']:.1f} | motors {v['motors']:.1f} | "
+          f"inverters {v['inverters']:.1f} | avionics {v['avionics']:.1f}")
+    print(f"Total {r['total_volume_L']:.1f} L")
+    print("Per pod   battery section L  radiator core L  radiators fit pod")
+    for p in r["radiator_packaging"]:
+        print(f"{p['pod']:9} {p['battery_section_envelope_L']:17.1f} {p['radiator_core_L']:16.1f}  "
+              f"{'yes' if p['fits_core_allowance'] else 'NO'}")
 
     print("\n-- Motors (HPDM fit: " + r["motor_family_fit"] + ") --")
     print("Rotor        rated kW  rated Nm  mass kg   max Nm  phase A  max rpm  elec Hz")

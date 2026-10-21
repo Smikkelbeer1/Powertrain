@@ -2,7 +2,8 @@
 transient thermal network.
 
 Architecture: 8 independent loops, two per wing pod.
-  * propulsion loop: coolant -> inverter cold plate -> motor jacket -> radiator
+  * propulsion loop: coolant -> inverter -> motor jacket -> radiator
+    (inverter integrated in the motor by default: no separate cold plate)
   * battery loop:    coolant -> battery cold plates -> radiator
 Radiator sizing uses the effectiveness-NTU method (counterflow surrogate):
   https://www.mathworks.com/help/hydro/ref/entuheattransfer.html
@@ -45,6 +46,7 @@ class Loop:
     coolant_kg: float
     acquisition_UA_W_K: float  # battery cells -> coolant conductance (battery loops)
     masses_kg: dict[str, float]
+    volumes_L: dict[str, float]  # outer volume of each component of the loop
     acquisition: dict[str, float]  # battery cold-plate details
 
 
@@ -153,8 +155,18 @@ def make_loop(x: Inputs, pod: int, is_battery: bool, hover_heat: float, cell_cou
         fan=0.2 + c.fan_mass_kg_per_kW * full_fan * c.fan_rating_margin / 1000,
         hoses=line * math.pi * ((diameter + 2 * c.hose_wall_m) ** 2 - diameter ** 2) / 4 * c.hose_rho_kg_m3,
         coolant=fluid, reservoir=c.reservoirs_each_kg, fittings=c.fittings_each_loop_kg,
-        plate=geometry["plates_kg"] if is_battery else c.inverter_plate_each_kg,
+        plate=(geometry["plates_kg"] if is_battery
+               else 0.0 if x.inverter.integrated_in_motor else c.inverter_plate_each_kg),
         TIM=geometry.get("TIM_kg", 0.0))
+    # Outer volumes [L]. Coolant inside the radiator, hoses and plates sits in
+    # those parts, so only the reserve (reservoir) is counted on its own. The
+    # battery cold plates are inside the battery pack envelope.
+    volumes = dict(
+        radiator=core * 1000,
+        fan=face * c.fan_depth_m * 1000,
+        pump=masses["pump"] / c.pump_density_kg_m3 * 1000,
+        hoses=line * math.pi * (diameter + 2 * c.hose_wall_m) ** 2 / 4 * 1000,
+        reservoir=c.coolant_reserve_each_loop_L)
     return Loop(
         name=("battery_" if is_battery else "propulsion_") + NAMES[pod], pod=pod,
         is_battery=is_battery, heat_design_W=reject, liquid_kg_s=mdot, flow_L_min=flow * 60000,
@@ -162,7 +174,8 @@ def make_loop(x: Inputs, pod: int, is_battery: bool, hover_heat: float, cell_cou
         face_m2=face, core_m3=core, UA_W_K=UA,
         inlet_m2=air_flow / (c.inlet_velocity_capture * x.aircraft.cruise_kmh / 3.6),
         full_fan_W=full_fan, fan_rating_W=full_fan * c.fan_rating_margin, coolant_kg=fluid,
-        acquisition_UA_W_K=geometry.get("UA_W_K", 0.0), masses_kg=masses, acquisition=geometry)
+        acquisition_UA_W_K=geometry.get("UA_W_K", 0.0), masses_kg=masses, volumes_L=volumes,
+        acquisition=geometry)
 
 
 def design_cooling(x: Inputs, ns: int, np: int, motors: MotorSizing) -> list[Loop]:

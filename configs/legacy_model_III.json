@@ -1,5 +1,5 @@
 {
-  "_comment": "Reproduces the original single-file albatros_model_III.py: fixed 40 kg motors, constant propeller efficiency a single L/D and transition power as a fraction of the motor rating.",
+  "_comment": "Reproduces the original single-file albatros_model_III.py: fixed 40 kg motors, separate inverters, constant propeller efficiency, a single L/D and transition power as a fraction of the motor rating.",
   "motor": {
     "mass_model": "fixed",
     "mass_each_kg": [
@@ -20,5 +20,8 @@
     "transition_power_reference": "rating",
     "transition_peak_fraction": 1.0,
     "back_transition_peak_fraction": 0.7
+  },
+  "inverter": {
+    "integrated_in_motor": false
   }
 }

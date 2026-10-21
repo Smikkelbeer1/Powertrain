@@ -163,6 +163,10 @@ class Motor:
     cp_J_kgK: float = 500.0  # specific heat of the motor (thermal mass)
     to_coolant_W_K: float = 600.0  # UA from windings to coolant
     limit_C: float = 120.0
+    # Average density of the motor envelope (incl. integrated inverter), used
+    # only for the volume budget: volume = mass / density. PLACEHOLDER
+    # (~3500 kg/m^3 is typical for compact axial-flux motors).
+    density_kg_m3: float = 3500.0
 
 
 @dataclass
@@ -207,7 +211,7 @@ class Battery:
     soh: float = 1.0  # state of health (capacity fraction)
     resistance_age_factor: float = 1.0
     noncooling_packaging_fraction: float = 0.15  # housing etc. = cells mass * this
-    volume_fill_fraction: float = 0.65
+    volume_fill_fraction: float = 0.65  # cells / pack envelope (rest: plates, BMS, housing)
     max_parallel: int = 250
     parallel_count: int = 0  # 0 = automatic sizing; >0 = check this fixed Np
 
@@ -235,12 +239,21 @@ class Balancing:
 
 @dataclass
 class Inverter:
-    """Motor drive.
+    """Motor drive (inverter).
+
+    integrated_in_motor = True: the inverter is built into the motor housing
+        (as for most HPDM-type motors). Its mass and volume are then part of
+        the motor mass/volume and are NOT counted separately, and it needs no
+        separate cold plate. Its losses and temperature are still modelled,
+        because the electronics still produce heat inside the motor.
+    integrated_in_motor = False: separate box, mass_each_kg and
+        volume_each_L are added to the budgets, plus a cold plate per loop.
 
     mode = "efficiency": loss = P_motor * (1/efficiency - 1)
     mode = "device":     approximate SiC two-level bridge losses (conduction,
                          switching, gate), NOT a validated device map.
     """
+    integrated_in_motor: bool = True
     mode: str = "efficiency"
     efficiency: float = 0.98
     switching_Hz: float = 20000.0
@@ -254,7 +267,8 @@ class Inverter:
     gate_charge_C: float = 200e-9
     gate_voltage_V: float = 18.0
     control_power_W: float = 15.0
-    mass_each_kg: float = 4.0
+    mass_each_kg: float = 4.0  # thermal mass always; budget only if separate
+    volume_each_L: float = 3.0  # only if separate (placeholder)
     cp_J_kgK: float = 800.0
     to_coolant_W_K: float = 300.0
     temp_limit_C: float = 85.0  # lumped assembly, NOT junction temperature
@@ -282,6 +296,7 @@ class Auxiliaries:
     dc_dc_eff: float = 0.94
     low_voltage_V: float = 28.0
     other_avionics_actuators_kg: float = 5.0
+    avionics_volume_L: float = 20.0  # all avionics boxes together (placeholder)
 
 
 @dataclass
@@ -318,6 +333,7 @@ class Cooling:
     pump_head_margin: float = 1.20
     pump_min_mass_kg: float = 0.50
     pump_mass_kg_per_kW: float = 2.0
+    pump_density_kg_m3: float = 2000.0  # pump volume = pump mass / this (placeholder)
     # Air side, radiator and fan
     air_cp_J_kgK: float = 1005.0
     air_design_rise_K: float = 5.0
@@ -328,6 +344,7 @@ class Cooling:
     fan_eff: float = 0.60
     fan_rating_margin: float = 1.25
     fan_mass_kg_per_kW: float = 1.0
+    fan_depth_m: float = 0.05  # fan + shroud depth over the radiator face
     radiator_depth_m: float = 0.06
     radiator_UA_per_m3_W_K: float = 100000.0  # ASSUMED, replace with vendor data
     radiator_envelope_density_kg_m3: float = 150.0
@@ -347,7 +364,7 @@ class Cooling:
     aluminum_k_W_mK: float = 180.0
     # Fixed hardware masses / volumes
     battery_manifold_each_kg: float = 0.50
-    inverter_plate_each_kg: float = 0.50
+    inverter_plate_each_kg: float = 0.50  # only if the inverter is a separate box
     reservoirs_each_kg: float = 0.40
     fittings_each_loop_kg: float = 0.40
     coolant_reserve_each_loop_L: float = 0.25
