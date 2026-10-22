@@ -51,7 +51,9 @@ def simulate(x: Inputs, ns: int, np: int, loops: list[Loop], motors: MotorSizing
         for elapsed, dt, t in time_steps(s, x.mission.dt_s):
             alt, speed = s.altitude(t), s.speed(t)
             rho, ambient, _ = atmosphere(x.mission.field_elevation_m + alt, x.cooling.sea_level_ambient_C)
-            fan, drag, air_fractions, _ = air_operation(x, loops, alt, speed)
+            # Downwash helps the radiators whenever the rotors carry the weight.
+            fan, drag, air_fractions, _ = air_operation(x, loops, alt, speed,
+                                                        rotor_borne=s.mode != "wing")
             pump = sum(l.pump_W for l in loops)
             aux = auxiliary_power(x, s.mode == "wing", ns)
             rotors = propulsion(x, s, t, motors.power_W, drag)

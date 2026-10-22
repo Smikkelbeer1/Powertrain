@@ -101,8 +101,11 @@ def validate(x: Inputs) -> None:
         raise ValueError("Invalid balancing duty/channel schedule")
     if mot.density_kg_m3 <= 0 or c.pump_density_kg_m3 <= 0 or not 0 < b.volume_fill_fraction <= 1:
         raise ValueError("Motor/pump densities must be positive and battery fill fraction in (0,1]")
-    if min(c.fan_depth_m, x.inverter.volume_each_L, x.auxiliaries.avionics_volume_L) < 0:
-        raise ValueError("Volumes and fan depth must be non-negative")
+    if min(c.fan_depth_m, x.inverter.volume_each_L, x.auxiliaries.avionics_volume_L,
+           c.hover_propwash_pressure_Pa, c.fan_volume_L_per_kW) < 0:
+        raise ValueError("Volumes, fan depth, fan L/kW and propwash pressure must be non-negative")
+    if not 0 <= c.fan_face_coverage <= 1:
+        raise ValueError("cooling.fan_face_coverage must be between 0 and 1")
     if x.inverter.mode not in ("efficiency", "device"):
         raise ValueError("Inverter mode must be efficiency or device")
     for name, value in [("motor efficiency", mot.efficiency), ("prop_eff", p.cruise_prop_eff),

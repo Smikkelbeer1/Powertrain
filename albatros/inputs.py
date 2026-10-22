@@ -345,6 +345,15 @@ class Cooling:
     fan_rating_margin: float = 1.25
     fan_mass_kg_per_kW: float = 1.0
     fan_depth_m: float = 0.05  # fan + shroud depth over the radiator face
+    # Help from the rotor downwash in rotor-borne flight (hover, vertical
+    # climb/descent, transition): the pressure the downwash delivers across
+    # the radiators. The fans only make the rest. 0 = no credit (conservative).
+    # Depends on where the radiators sit -> ask the aero/propeller team.
+    hover_propwash_pressure_Pa: float = 0.0
+    fan_face_coverage: float = 1.0  # fraction of the radiator face covered by fans
+    # > 0: fan volume = this * fan rating [L per kW] instead of the geometry
+    # rule (face area * coverage * depth).
+    fan_volume_L_per_kW: float = 0.0
     radiator_depth_m: float = 0.06
     radiator_UA_per_m3_W_K: float = 100000.0  # ASSUMED, replace with vendor data
     radiator_envelope_density_kg_m3: float = 150.0

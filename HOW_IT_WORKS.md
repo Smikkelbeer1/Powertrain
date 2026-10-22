@@ -480,7 +480,9 @@ It does not affect the flight. The flight simply starts with a 0.2 % spread
 5. **Radiator size** with the ε-NTU method: required effectiveness → NTU →
    required UA. The core volume is the larger of "enough face area for the
    airflow" and "enough UA" (assumed 100 kW/K per m³ of core).
-6. **Fan** power for the radiator air pressure drop.
+6. **Fan** power: `fan pressure × air volume flow / fan efficiency`. The fan
+   pressure is the radiator's air-side pressure drop (500 Pa) **minus the
+   downwash credit** `cooling.hover_propwash_pressure_Pa` (see below).
 7. **Masses** of radiator, pump, fan, hoses, coolant, reservoir, fittings,
    cold plates and thermal interface material.
 
@@ -502,8 +504,25 @@ power stops changing.
 **In flight** (`air_operation`): at altitude the air is thinner. Pushing the
 same mass of air needs more pressure, so if the fan rating isn't enough, the
 airflow is reduced (found by bisection) and the radiator rejects less heat.
-In forward flight, ram pressure helps the fan; the resulting drag is added to
-the wing-borne power.
+Two things help the fan push air through the radiator:
+
+* **Ram air** in forward flight. The resulting drag is added to the
+  wing-borne power. At cruise speed ram pressure (~1600 Pa) is larger than
+  the 500 Pa the radiators need, so the fans are almost idle in cruise.
+* **Rotor downwash** whenever the rotors carry the aircraft (hover, vertical
+  climb and descent, transition, emergency). The model subtracts
+  `cooling.hover_propwash_pressure_Pa` from what the fans must deliver. Its
+  energy is already part of the rotor power, so it is not charged again.
+  The default is **0** (no credit, conservative), because the real value
+  depends on where the radiators sit relative to the rotors. In theory the
+  fully developed wake carries a pressure of about the disc loading (T/A, a
+  few hundred to ~1400 Pa here), but a radiator only captures part of it.
+  Get the value from the aero/propeller team.
+
+With a large downwash credit the fans become small. They then have little
+spare pressure for thin air: at 600 m the radiator needs ~6 % more pressure,
+which can be 30 % more *fan* pressure. If the run reports "fan rating
+insufficient at altitude", raise `cooling.fan_rating_margin` (e.g. 1.4).
 
 **Temperatures** (`thermal_step`): every part is one lumped node,
 `m·cp·dT/dt = heat in − heat to coolant`. Heat to the coolant is limited by
@@ -732,7 +751,7 @@ outer volume of each part). The totals are printed under `-- Volume budget (L) -
 |---|---|---|
 | Battery packs | bare cell volume / `battery.volume_fill_fraction` (0.65). The other 35 % is cold plates, BMS, busbars and housing | 188.0 L (cells alone 122.2 L) |
 | Radiators | sum of the 8 radiator core volumes from the cooling sizing | 107.1 L |
-| Fans | radiator face area × `cooling.fan_depth_m` (fan + shroud) | 89.3 L |
+| Fans | radiator face area × `cooling.fan_face_coverage` × `cooling.fan_depth_m`, or, if `cooling.fan_volume_L_per_kW` > 0, that value × fan rating | 89.3 L (full coverage, no downwash credit) |
 | Pumps | pump mass / `cooling.pump_density_kg_m3` | 2.3 L |
 | Hoses | supply + return length × outer cross-section | 6.6 L |
 | Reservoirs | coolant reserve per loop | 2.0 L |
@@ -748,6 +767,13 @@ Notes:
   volume.
 * The **battery and radiator** volumes follow from the sizing (cell geometry,
   required heat-exchanger size), so they change with the design.
+* **Fan volume** depends on settings that are currently assumptions: a 5 cm
+  layer over the whole radiator face (default), a partial layer
+  (`fan_face_coverage`), or proportional to fan power (`fan_volume_L_per_kW`).
+  Combined with a downwash credit, the fans can shrink a lot. At 750 kg,
+  400 Pa of downwash credit cuts the fan rating from 9.3 to 1.8 kW and the fan
+  mass from 10.9 to 3.4 kg. With 50 % coverage that gives 44 L of fans; with
+  5 L/kW, 9 L.
 * **Motor, pump and avionics** volumes use assumed densities or fixed values
   (placeholders, marked in `inputs.py`). Replace them with supplier data when
   available.

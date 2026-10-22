@@ -182,3 +182,32 @@ def test_volume_budget_and_integrated_inverter():
     separate = run_model(x)
     assert math.isclose(separate["inverters_total_kg"], 4 * x.inverter.mass_each_kg)
     assert separate["accounted_subsystems_kg"] > r["accounted_subsystems_kg"]
+
+
+def test_propwash_credit_reduces_fans_not_radiators():
+    x = Inputs()
+    motors = size_motors(x, mission_segments(x))
+    base = design_cooling(x, 190, 25, motors)
+    x.cooling.hover_propwash_pressure_Pa = 400  # downwash delivers 400 of the 500 Pa
+    helped = design_cooling(x, 190, 25, motors)
+    for b, h in zip(base, helped):
+        assert math.isclose(h.fan_design_dp_Pa, 100)
+        assert h.fan_rating_W < 0.25 * b.fan_rating_W  # ~1/5 of the pressure, slightly less heat
+        assert math.isclose(h.core_m3, b.core_m3, rel_tol=0.05)  # radiator still needed
+    # In hover the downwash now helps; in cruise (not rotor-borne) it does not.
+    hover_fan = air_operation(x, helped, 60, 0, rotor_borne=True)[0]
+    no_help = air_operation(x, helped, 60, 0, rotor_borne=False)[0]
+    assert hover_fan < no_help
+
+
+def test_fan_volume_rules():
+    x = Inputs()
+    motors = size_motors(x, mission_segments(x))
+    full = design_cooling(x, 190, 25, motors)
+    x.cooling.fan_face_coverage = 0.5
+    half = design_cooling(x, 190, 25, motors)
+    assert math.isclose(sum(l.volumes_L["fan"] for l in half), 0.5 * sum(l.volumes_L["fan"] for l in full))
+    x.cooling.fan_volume_L_per_kW = 4.0  # power rule overrides the geometry rule
+    by_power = design_cooling(x, 190, 25, motors)
+    for l in by_power:
+        assert math.isclose(l.volumes_L["fan"], 4.0 * l.fan_rating_W / 1000)

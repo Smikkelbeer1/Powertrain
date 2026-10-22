@@ -43,6 +43,7 @@ class Loop:
     inlet_m2: float
     full_fan_W: float  # fan power at ground design flow
     fan_rating_W: float
+    fan_design_dp_Pa: float  # pressure the fan must make (after downwash credit)
     coolant_kg: float
     acquisition_UA_W_K: float  # battery cells -> coolant conductance (battery loops)
     masses_kg: dict[str, float]
@@ -144,7 +145,11 @@ def make_loop(x: Inputs, pod: int, is_battery: bool, hover_heat: float, cell_cou
     face = core / c.radiator_depth_m
     UA = core * c.radiator_UA_per_m3_W_K
     air_flow = air_mdot / rho_air
-    full_fan = c.radiator_air_dp_Pa * air_flow / c.fan_eff
+    # The fans only have to make the pressure the downwash does not deliver
+    # at the hover design point (never less than zero).
+    fan_dp = max(0.0, c.radiator_air_dp_Pa - c.hover_propwash_pressure_Pa)
+    full_fan = fan_dp * air_flow / c.fan_eff
+    fan_rating = full_fan * c.fan_rating_margin
     hose_fluid = line * math.pi * diameter ** 2 / 4
     acquired_fluid = geometry["coolant_m3"] if is_battery else c.jacket_and_plate_fluid_each_L / 1000
     fluid = (hose_fluid + acquired_fluid + core * c.radiator_coolant_volume_fraction
@@ -152,7 +157,7 @@ def make_loop(x: Inputs, pod: int, is_battery: bool, hover_heat: float, cell_cou
     masses = dict(
         radiator=core * c.radiator_envelope_density_kg_m3 + c.radiator_header_kg,
         pump=c.pump_min_mass_kg + c.pump_mass_kg_per_kW * pump_W / 1000,
-        fan=0.2 + c.fan_mass_kg_per_kW * full_fan * c.fan_rating_margin / 1000,
+        fan=0.2 + c.fan_mass_kg_per_kW * fan_rating / 1000,
         hoses=line * math.pi * ((diameter + 2 * c.hose_wall_m) ** 2 - diameter ** 2) / 4 * c.hose_rho_kg_m3,
         coolant=fluid, reservoir=c.reservoirs_each_kg, fittings=c.fittings_each_loop_kg,
         plate=(geometry["plates_kg"] if is_battery
@@ -161,9 +166,13 @@ def make_loop(x: Inputs, pod: int, is_battery: bool, hover_heat: float, cell_cou
     # Outer volumes [L]. Coolant inside the radiator, hoses and plates sits in
     # those parts, so only the reserve (reservoir) is counted on its own. The
     # battery cold plates are inside the battery pack envelope.
+    if c.fan_volume_L_per_kW > 0:  # fan volume follows the fan's job (power)
+        fan_volume = c.fan_volume_L_per_kW * fan_rating / 1000
+    else:  # a layer of fans over (part of) the radiator face
+        fan_volume = face * c.fan_face_coverage * c.fan_depth_m * 1000
     volumes = dict(
         radiator=core * 1000,
-        fan=face * c.fan_depth_m * 1000,
+        fan=fan_volume,
         pump=masses["pump"] / c.pump_density_kg_m3 * 1000,
         hoses=line * math.pi * (diameter + 2 * c.hose_wall_m) ** 2 / 4 * 1000,
         reservoir=c.coolant_reserve_each_loop_L)
@@ -173,7 +182,7 @@ def make_loop(x: Inputs, pod: int, is_battery: bool, hover_heat: float, cell_cou
         pump_head_Pa=head, pump_W=pump_W, hose_ID_m=diameter, hose_Re=re, air_kg_s=air_mdot,
         face_m2=face, core_m3=core, UA_W_K=UA,
         inlet_m2=air_flow / (c.inlet_velocity_capture * x.aircraft.cruise_kmh / 3.6),
-        full_fan_W=full_fan, fan_rating_W=full_fan * c.fan_rating_margin, coolant_kg=fluid,
+        full_fan_W=full_fan, fan_rating_W=fan_rating, fan_design_dp_Pa=fan_dp, coolant_kg=fluid,
         acquisition_UA_W_K=geometry.get("UA_W_K", 0.0), masses_kg=masses, volumes_L=volumes,
         acquisition=geometry)
 
@@ -204,19 +213,23 @@ def design_cooling(x: Inputs, ns: int, np: int, motors: MotorSizing) -> list[Loo
     raise ValueError("Cooling sizing/load iteration did not converge")
 
 
-def air_operation(x: Inputs, loops: list[Loop], altitude: float,
-                  speed: float) -> tuple[float, float, list[float], float]:
+def air_operation(x: Inputs, loops: list[Loop], altitude: float, speed: float,
+                  rotor_borne: bool = False) -> tuple[float, float, list[float], float]:
     """Radiator airflow at a flight condition.
 
     Returns (total fan power W, ram-drag power W, airflow fraction per loop,
-    ambient degC). Ram pressure from forward speed helps the fan; if the fan
-    rating is too small (thin air at altitude) the achievable airflow fraction
-    is found by bisection and the radiators then reject less heat.
-    The ram pressure * volume flow is counted as drag power, not free cooling.
+    ambient degC). Two things help the fan push air through the radiator:
+      * ram pressure from forward speed (counted as drag power, not free)
+      * downwash pressure when the rotors carry the aircraft (rotor_borne),
+        Cooling.hover_propwash_pressure_Pa; its energy is already part of
+        the rotor power, so it is not charged again.
+    If the fan rating is too small (thin air at altitude) the achievable
+    airflow fraction is found by bisection and the radiators reject less heat.
     """
     c = x.cooling
     rho, ambient, _ = atmosphere(x.mission.field_elevation_m + altitude, c.sea_level_ambient_C)
     rho_ref, _, _ = atmosphere(x.mission.field_elevation_m, c.sea_level_ambient_C)
+    propwash = c.hover_propwash_pressure_Pa if rotor_borne else 0.0
     fan, drag = 0.0, 0.0
     air_fractions: list[float] = []
     for l in loops:
@@ -225,7 +238,9 @@ def air_operation(x: Inputs, loops: list[Loop], altitude: float,
         vf_full = l.air_kg_s / rho
 
         def fan_needed(fraction: float) -> float:
-            return max(0.0, dp_full * fraction ** 2 - ram) * vf_full * fraction / c.fan_eff
+            # Pressure still missing after ram air and downwash, times volume flow.
+            missing = max(0.0, dp_full * fraction ** 2 - ram - propwash)
+            return missing * vf_full * fraction / c.fan_eff
 
         fraction = 1.0
         if fan_needed(1.0) > l.fan_rating_W:
