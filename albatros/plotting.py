@@ -8,7 +8,7 @@ from typing import Any
 def plot_results(data: dict[str, Any] | list[dict[str, Any]], save: Path | None, show: bool,
                  x_key: str = "mtow_kg", x_label: str = "MTOW (kg)") -> None:
     """Single design -> SOC/voltage, power, temperatures, altitude vs time.
-    Sweep (list)   -> battery, motor, remaining mass and motor temperature vs x_key.
+    Sweep (list)   -> range, motor mass, remaining mass and motor temperature vs x_key.
     """
     try:
         import matplotlib.pyplot as plt
@@ -20,7 +20,7 @@ def plot_results(data: dict[str, Any] | list[dict[str, Any]], save: Path | None,
         if not ok:
             raise ValueError("No successful sweep points to plot")
         xs = [r[x_key] for r in ok]
-        for ax, key, label in [(axes[0, 0], "battery_dry_kg", "Battery incl BMS (kg)"),
+        for ax, key, label in [(axes[0, 0], "range_km", "Mission range (km)"),
                                (axes[0, 1], "motors_kg", "Four motors (kg)"),
                                (axes[1, 0], "remaining_kg", "Remaining MTOW (kg)"),
                                (axes[1, 1], "worst_motor_C", "All-case motor temperature (C)")]:

@@ -52,6 +52,9 @@ class Aircraft:
     # inner (0/1) and one outer (2/3) rotor. These are ASSUMED controllable pairs.
     emergency_pairs: tuple[tuple[int, int], ...] = ((0, 3), (1, 2))
     emergency_s: float = 30.0  # duration of the two-rotor emergency hover
+    # False: only start emergencies while airborne (skip the checkpoints at
+    # 0 m: before take-off, take-off hover at ground level, after landing).
+    emergency_on_ground: bool = False
     emergency_inner_thrust_fraction: float = 0.50  # share of weight on the inner rotor
     # Normal hover thrust split. 0 = split in proportion to rotor disc area.
     normal_inner_thrust_fraction: float = 0.0
@@ -181,7 +184,11 @@ class Cell:
     nominal_V: float = 3.6
     max_V: float = 4.2
     min_V: float = 2.5
-    max_current_A: float = 45.0
+    max_current_A: float = 45.0  # continuous (datasheet, 80 degC cut-off)
+    # Short-term limit during the 30 s two-rotor emergency. The P45B datasheet
+    # gives no pulse rating, so it equals the continuous value until a
+    # supplier figure is available.
+    emergency_max_current_A: float = 45.0
     resistance_ohm: float = 0.015
     mass_kg: float = 0.070
     diameter_m: float = 0.0216
@@ -212,8 +219,13 @@ class Battery:
     resistance_age_factor: float = 1.0
     noncooling_packaging_fraction: float = 0.15  # housing etc. = cells mass * this
     volume_fill_fraction: float = 0.65  # cells / pack envelope (rest: plates, BMS, housing)
+    # Battery pack mass as a fraction of MTOW (cells + packaging + BMS), given
+    # by the aircraft design team. The model fits the largest Np in this mass
+    # and finds the LONGEST cruise it can fly. PLACEHOLDER value.
+    # 0 = old behaviour: size the smallest Np for the set mission.
+    mass_fraction: float = 0.40
     max_parallel: int = 250
-    parallel_count: int = 0  # 0 = automatic sizing; >0 = check this fixed Np
+    parallel_count: int = 0  # >0 = check this fixed Np (overrides mass_fraction)
 
 
 @dataclass

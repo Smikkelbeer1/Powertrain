@@ -6,9 +6,12 @@ data from the other departments and uses them to size:
 
 * **motors**: peak power, peak torque and **mass** (from the HPDM mass–torque fit).
   The inverter is integrated in the motor by default (`inverter.integrated_in_motor`)
-* **battery**: cells in **series** (from the bus voltage) and in **parallel** (the
-  smallest number that flies the mission and every emergency case), total
-  cell count, energy, **mass** and **volume**
+* **battery**: the battery mass is **given** as a fraction of MTOW
+  (`battery.mass_fraction`). The tool fits cells in **series** (from the bus
+  voltage) and in **parallel** (as many as fit in that mass), and gives the
+  cell count, energy and **volume**
+* **maximum cruise time and range**: the longest flight that keeps the SOC
+  reserve and passes every two-rotor emergency case
 * **cooling**: eight liquid loops (pumps, hoses, radiators, fans), with their mass and volume
 * **checks**: temperatures, SOC reserve, cell current and voltage, bus voltage,
   rotor tip Mach and radiator packaging, shown in a mass and volume budget
@@ -41,8 +44,19 @@ why the code is structured the way it is.
 | **MTOW-driven** (default) | `--mass 750` or `aircraft.mass_kg` | The torque each motor needs at this MTOW is computed, and the motor mass follows from the HPDM fit |
 | **Torque-driven** | `--torque 600` or `motor.peak_torque_Nm > 0` | All four motors get this peak torque; the tool searches for the largest MTOW they can carry, then sizes everything else |
 
-MTOW is the variable we optimise for. Use `--sweep` to see how battery,
+MTOW is the variable we optimise for. Use `--sweep` to see how range,
 motor and cooling mass, and the mass left over for the airframe, change with it.
+
+## Battery: given mass or sized
+
+| `battery.mass_fraction` | What happens |
+|---|---|
+| **> 0** (default 0.40, placeholder) | battery pack = fraction × MTOW → largest Np that fits → **maximum cruise and range** |
+| **0** | the older mode: the smallest battery that flies the fixed `mission.cruise_s` |
+
+The two-rotor emergency is often what limits the flight, via the cell current
+limit. See `cell.emergency_max_current_A`, `aircraft.emergency_on_ground` and
+section 7.5 of [HOW_IT_WORKS.md](HOW_IT_WORKS.md).
 
 ## Inputs: who provides what
 

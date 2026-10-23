@@ -14,7 +14,8 @@ from albatros.mission import Segment, mission_segments
 from albatros.propulsion import (drag_N, hover_constants, mtow_for_torque, prop_coefficients, propulsion,
                                  required_ratings, size_motors, solve_cruise_rotor)
 from albatros.recovery import landing_recovery
-from albatros.sizing import run_model, sweep_values
+from albatros.sizing import (electrical_check, emergency_checkpoints, parallel_from_mass, run_model,
+                             sweep_values)
 from albatros.state import State, initial_state
 
 HOVER = Segment("hover", 1, 0)
@@ -211,3 +212,59 @@ def test_fan_volume_rules():
     by_power = design_cooling(x, 190, 25, motors)
     for l in by_power:
         assert math.isclose(l.volumes_L["fan"], 4.0 * l.fan_rating_W / 1000)
+
+
+def test_battery_mass_fraction_fits_largest_pack():
+    x = Inputs()  # default: battery mass fraction mode
+    budget = x.battery.mass_fraction * x.aircraft.mass_kg
+    np, got_budget = parallel_from_mass(x, 190)
+    assert math.isclose(got_budget, budget)
+
+    def pack_kg(n: int) -> float:  # same formula as the mass budget in run_model
+        return (190 * n * x.cell.mass_kg * (1 + x.battery.noncooling_packaging_fraction)
+                + balancing_report(x, 190, n)["hardware_mass_kg"])
+
+    assert pack_kg(np) <= budget < pack_kg(np + 1)  # largest Np that still fits
+
+
+def test_max_cruise_is_the_limit():
+    x = Inputs()
+    r = run_model(x)
+    assert r["sizing_mode"].startswith("battery mass fraction")
+    assert r["battery_dry_with_BMS_kg"] <= r["battery_mass_budget_kg"]
+    assert r["cruise_limit"]  # a little longer cruise must fail
+    # The found cruise passes; 10 s more fails (search resolution is 1 s).
+    motors = size_motors(x, mission_segments(x))
+    for extra, should_pass in ((0, True), (10, False)):
+        trial = Inputs()
+        trial.mission.cruise_s = r["cruise_s"] + extra
+        reasons = electrical_check(trial, r["series"], r["parallel"], motors, mission_segments(trial))
+        assert (not reasons) == should_pass
+    assert r["range_km"] > r["cruise_s"] * x.aircraft.cruise_kmh / 3600  # cruise + climb/descent
+
+
+def test_mass_fraction_zero_gives_automatic_sizing():
+    x = Inputs()
+    x.battery.mass_fraction = 0
+    r = run_model(x)
+    assert r["sizing_mode"] == "automatic electrical sizing"
+    assert r["cruise_s"] == x.mission.cruise_s and r["battery_mass_budget_kg"] is None
+
+
+def test_emergency_rules_ground_checkpoints_and_current_limit():
+    x = Inputs()
+    checkpoints = [("departure", 0.0, None), ("after_cruise", 600.0, None),
+                   ("after_vertical_descent", 0.0, None)]
+    assert [c[0] for c in emergency_checkpoints(x, checkpoints)] == ["after_cruise"]
+    x.aircraft.emergency_on_ground = True
+    assert len(emergency_checkpoints(x, checkpoints)) == 3
+
+    # 750 kg, 19P, 20 min cruise: the emergency exceeds 45 A per cell, but a
+    # higher short-term emergency limit lets it pass. Normal flight still uses 45 A.
+    x = Inputs()
+    x.mission.cruise_s = 1200
+    motors = size_motors(x, mission_segments(x))
+    strict = electrical_check(x, 190, 19, motors, mission_segments(x))
+    assert any(r.startswith("cell current (emergency") for r in strict)
+    x.cell.emergency_max_current_A = 60
+    assert electrical_check(x, 190, 19, motors, mission_segments(x)) == []

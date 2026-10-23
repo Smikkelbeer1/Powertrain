@@ -64,6 +64,7 @@ def sweep_row(variable: str, value: float, r: dict[str, Any]) -> dict[str, Any]:
     """Compact one-line summary of a design, used for sweeps."""
     return {variable: value, "mtow_kg": r["mtow_kg"], "series": r["series"],
             "parallel": r["parallel"], "cell_count": r["cell_count"],
+            "cruise_min": r["cruise_s"] / 60, "range_km": r["range_km"],
             "battery_cells_kg": r["battery_cells_kg"], "battery_dry_kg": r["battery_dry_with_BMS_kg"],
             "motors_kg": r["motors_total_kg"],
             "max_rated_torque_Nm": max(d["rated_torque_Nm"] for d in r["drive_requirements"]),
@@ -95,7 +96,16 @@ def print_design(result: dict[str, Any]) -> None:
     print(f"Nominal end weakest SOC {100 * m['end_min_group_soc']:.1f}% | minimum bus "
           f"{m['min_bus_V']:.1f} V | peak cell {m['peak_cell_A']:.1f} A")
     print("Sizing mode:", r["sizing_mode"], "| peak nominal current phase:", r["peak_current_nominal_phase"])
-    print("Why not one parallel string fewer:", ", ".join(r["previous_parallel_failure"]))
+    if r["battery_mass_budget_kg"] is not None:  # battery mass fraction mode
+        budget = r["battery_mass_budget_kg"]
+        print(f"Battery budget {budget:.1f} kg ({100 * inp['battery']['mass_fraction']:.0f} % of MTOW) "
+              f"-> pack {r['battery_dry_with_BMS_kg']:.1f} kg ({budget - r['battery_dry_with_BMS_kg']:.1f} kg "
+              f"unused, less than one more {r['series']}S string)")
+        print(f"MAX CRUISE {r['cruise_s'] / 60:.1f} min | mission range {r['range_km']:.0f} km | "
+              f"a longer cruise fails on: {', '.join(r['cruise_limit'])}")
+    else:
+        print(f"Cruise {r['cruise_s'] / 60:.1f} min (set) | mission range {r['range_km']:.0f} km")
+        print("Why not one parallel string fewer:", ", ".join(r["previous_parallel_failure"]))
     balance = r["balancing"]
     hours = balance["estimated_ground_hours"]
     print(f"Passive balance: {balance['series_group_channels']} channels, "

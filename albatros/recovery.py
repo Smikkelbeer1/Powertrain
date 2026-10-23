@@ -76,9 +76,11 @@ def landing_recovery(x: Inputs, design: dict[str, Any], max_cruise_s: float,
         raise ValueError("Recovery requires finite MAX >= 0, STEP > 0 and thermal margin >= 0")
     if math.ceil(max_cruise_s/step_s) > 10000:
         raise ValueError("Recovery search exceeds 10,000 trials; increase cruise step")
-    # A torque-driven run_model replaces the MTOW; apply that before comparing.
+    # run_model may replace the MTOW (torque mode) and the cruise time (battery
+    # mass fraction mode); apply both before comparing.
     x = deepcopy(x)
     x.aircraft.mass_kg = design["mtow_kg"]
+    x.mission.cruise_s = design["cruise_s"]
     if json.loads(json.dumps(asdict(x))) != json.loads(json.dumps(design["inputs"])):
         raise ValueError("Recovery inputs must match the supplied baseline design")
     ns, np = design["series"], design["parallel"]

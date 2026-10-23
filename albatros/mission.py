@@ -42,6 +42,16 @@ class Segment:
     def speed(self, t: float) -> float:
         return max(0.0, self.v0_m_s + self.ax_m_s2 * t)
 
+    def distance(self) -> float:
+        """Horizontal distance flown in this segment [m] (constant acceleration)."""
+        T = self.duration_s
+        return self.v0_m_s * T + 0.5 * self.ax_m_s2 * T * T
+
+
+def mission_range_km(segments: list[Segment]) -> float:
+    """Total horizontal distance of a mission [km]."""
+    return sum(s.distance() for s in segments) / 1000
+
 
 def mission_segments(x: Inputs) -> list[Segment]:
     """Build the nominal mission from the Mission inputs."""

@@ -4,8 +4,12 @@ run_model() does, in order:
   1. (torque-driven mode only) find the MTOW the given motor torque can carry
   2. series count Ns from the bus voltage ceiling
   3. motor power, torque and MASS                 (propulsion.size_motors)
-  4. smallest parallel count Np that flies the mission AND every emergency
-     case without violating SOC / current / voltage limits (bisection)
+  4. battery, one of three modes:
+     * mass fraction (default): Np = largest that fits in fraction * MTOW,
+       then the LONGEST cruise that still passes every check (bisection)
+     * automatic (mass_fraction = 0): smallest Np that flies the set mission
+       AND every emergency case without violating SOC/current/voltage limits
+     * fixed Np (parallel_count > 0): check that battery on the set mission
   5. cooling loops for that battery              (cooling.design_cooling)
   6. full thermal simulation of the mission and all emergency branches
   7. mass and volume budget: battery, cooling, motors, (inverters), avionics
@@ -22,7 +26,7 @@ from .balancing import balancing_report
 from .cooling import design_cooling
 from .electrical import section_counts
 from .inputs import ALL, NAMES, Inputs
-from .mission import Segment, mission_segments
+from .mission import Segment, mission_range_km, mission_segments
 from .propulsion import MotorSizing, mtow_for_torque, size_motors
 from .simulation import ELECTRICAL_FLAGS, metrics, simulate
 
@@ -104,6 +108,10 @@ def validate(x: Inputs) -> None:
     if min(c.fan_depth_m, x.inverter.volume_each_L, x.auxiliaries.avionics_volume_L,
            c.hover_propwash_pressure_Pa, c.fan_volume_L_per_kW) < 0:
         raise ValueError("Volumes, fan depth, fan L/kW and propwash pressure must be non-negative")
+    if cell.emergency_max_current_A <= 0:
+        raise ValueError("cell.emergency_max_current_A must be positive")
+    if not 0 <= b.mass_fraction < 1:
+        raise ValueError("battery.mass_fraction must be >= 0 and < 1 (0 = automatic sizing)")
     if not 0 <= c.fan_face_coverage <= 1:
         raise ValueError("cooling.fan_face_coverage must be between 0 and 1")
     if x.inverter.mode not in ("efficiency", "device"):
@@ -133,46 +141,119 @@ def series_count(x: Inputs) -> int:
     return ns
 
 
+def emergency_checkpoints(x: Inputs, checkpoints: list) -> list:
+    """The mission checkpoints from which a two-rotor emergency is started.
+
+    Unless Aircraft.emergency_on_ground is True, only airborne ones (altitude
+    above 0 m): an emergency on the ground just means "don't take off".
+    """
+    return [(label, alt, state) for label, alt, state in checkpoints
+            if x.aircraft.emergency_on_ground or alt > 0]
+
+
+def electrical_check(x: Inputs, ns: int, np: int, motors: MotorSizing,
+                     segments: list[Segment]) -> list[str]:
+    """Why an Ns x Np battery can NOT fly these segments (empty list = it can).
+
+    Checks the normal mission and a two-rotor emergency hover started from the
+    end of EVERY segment, against SOC reserve, cell current, cell voltage and
+    bus voltage. Temperatures are off here (fast); they are checked later.
+    """
+    a = x.aircraft
+    try:
+        loops = design_cooling(x, ns, np, motors)
+        normal = simulate(x, ns, np, loops, motors, segments, thermal=False,
+                          stop_on_electrical=True)
+        flags = set(normal.issues) & ELECTRICAL_FLAGS
+        # Stop at the first failing case: we only need to know IF it fails.
+        cases = [(label, alt, state, pair)
+                 for label, alt, state in emergency_checkpoints(x, normal.checkpoints)
+                 for pair in a.emergency_pairs]
+        for label, alt, state, pair in cases:
+            if flags:
+                break
+            emergency = simulate(x, ns, np, loops, motors,
+                                 [Segment("emergency_hover", a.emergency_s, alt,
+                                          active=tuple(pair))],
+                                 state, thermal=False, stop_on_electrical=True)
+            # Say WHERE it failed, e.g. "cell current (emergency hover after cruise)"
+            flags.update(f"{flag} (emergency hover {label.replace('_', ' ')})"
+                         for flag in set(emergency.issues) & ELECTRICAL_FLAGS)
+        return sorted(flags)
+    except ValueError as exc:
+        # Only "battery too weak" errors mean infeasible; anything else is a
+        # real input error and must be shown to the user.
+        if "Battery" not in str(exc) and "Cooling sizing/load" not in str(exc):
+            raise
+        return [str(exc)]
+
+
+def parallel_from_mass(x: Inputs, ns: int) -> tuple[int, float]:
+    """BATTERY-FRACTION MODE: largest Np whose pack fits in the mass budget.
+
+    pack mass = Ns * Np * cell mass * (1 + packaging fraction) + BMS hardware
+    The BMS/balancing hardware depends on Ns only (one channel per series
+    group), so it is subtracted first. Returns (Np, budget kg).
+    """
+    b, cell = x.battery, x.cell
+    budget = b.mass_fraction * x.aircraft.mass_kg
+    bms_kg = balancing_report(x, ns, 1)["hardware_mass_kg"]
+    per_string_kg = ns * cell.mass_kg * (1 + b.noncooling_packaging_fraction)
+    np = math.floor((budget - bms_kg) / per_string_kg + 1e-9)  # round DOWN: must fit
+    if np < 1:
+        raise ValueError(f"Battery budget {budget:.1f} kg is too small for even one "
+                         f"{ns}S string ({per_string_kg + bms_kg:.1f} kg)")
+    return np, budget
+
+
+def max_cruise(x: Inputs, ns: int, np: int, motors: MotorSizing,
+               resolution_s: float = 1.0) -> tuple[float, list[str]]:
+    """BATTERY-FRACTION MODE: longest cruise [s] this battery can fly.
+
+    A longer cruise only ever lowers the SOC, so "passes" turns into "fails" at
+    one point: double the cruise until it fails, then bisect down to
+    ``resolution_s``. Returns (cruise_s, reasons the next longer cruise fails).
+    """
+    def check(cruise_s: float) -> list[str]:
+        trial = deepcopy(x)
+        trial.mission.cruise_s = cruise_s
+        return electrical_check(trial, ns, np, motors, mission_segments(trial))
+
+    reasons = check(0.0)
+    if reasons:
+        raise ValueError(f"{ns}S{np}P battery cannot fly the mission even without cruise: "
+                         + ", ".join(reasons))
+    low, high = 0.0, max(x.mission.cruise_s, 600.0)  # low passes, high is a guess
+    while not check(high):  # empty list = passes -> try twice as long
+        low, high = high, 2 * high
+        if high > 48 * 3600:
+            raise ValueError("Max cruise search passed 48 h; check the inputs")
+    while high - low > resolution_s:
+        mid = (low + high) / 2
+        if check(mid):  # non-empty list = fails
+            high = mid
+        else:
+            low = mid
+    return low, check(high)
+
+
 def size_parallel_count(x: Inputs, ns: int, motors: MotorSizing,
                         segments: list[Segment]) -> tuple[int, dict[int, tuple[bool, list[str]]]]:
-    """Smallest Np for which the mission and ALL emergency branches stay inside
-    the electrical limits (or the user's fixed Np).
+    """AUTOMATIC MODE: smallest Np for which the mission and ALL emergency
+    branches stay inside the electrical limits (or the user's fixed Np).
 
     More parallel cells -> less current per cell, less voltage sag, more
     energy, so feasibility is (almost) monotonic in Np: double Np until it
     works, then bisect, then double-check the counts just below.
     Returns (Np, cache of {Np: (feasible, reasons)}).
     """
-    a, b = x.aircraft, x.battery
+    b = x.battery
     cache: dict[int, tuple[bool, list[str]]] = {}
 
     def feasible(np: int) -> bool:
-        if np in cache:
-            return cache[np][0]
-        try:
-            loops = design_cooling(x, ns, np, motors)
-            normal = simulate(x, ns, np, loops, motors, segments, thermal=False,
-                              stop_on_electrical=True)
-            flags = set(normal.issues) & ELECTRICAL_FLAGS
-            # Emergency: start a two-rotor hover from the end of EVERY segment.
-            # Stop at the first failing case (we only need to know IF it fails).
-            cases = [(alt, state, pair) for _, alt, state in normal.checkpoints
-                     for pair in a.emergency_pairs]
-            for alt, state, pair in cases:
-                if flags:
-                    break
-                emergency = simulate(x, ns, np, loops, motors,
-                                     [Segment("emergency_hover", a.emergency_s, alt,
-                                              active=tuple(pair))],
-                                     state, thermal=False, stop_on_electrical=True)
-                flags.update(set(emergency.issues) & ELECTRICAL_FLAGS)
-            cache[np] = (not flags, sorted(flags))
-        except ValueError as exc:
-            # Only "battery too weak" errors mean infeasible; anything else is a
-            # real input error and must be shown to the user.
-            if "Battery" not in str(exc) and "Cooling sizing/load" not in str(exc):
-                raise
-            cache[np] = (False, [str(exc)])
+        if np not in cache:  # each Np is simulated at most once
+            reasons = electrical_check(x, ns, np, motors, segments)
+            cache[np] = (not reasons, reasons)
         return cache[np][0]
 
     if b.parallel_count > 0:
@@ -213,7 +294,22 @@ def run_model(x: Inputs) -> dict[str, Any]:
     ns = series_count(x)
     segments = mission_segments(x)
     motors = size_motors(x, segments)
-    np, cache = size_parallel_count(x, ns, motors, segments)
+
+    # ---- Battery: three modes --------------------------------------------
+    budget_kg, cruise_limit = None, []
+    if b.parallel_count == 0 and b.mass_fraction > 0:
+        # Battery mass is GIVEN: fit the pack, then find the longest cruise.
+        sizing_mode = "battery mass fraction (max cruise)"
+        np, budget_kg = parallel_from_mass(x, ns)
+        x.mission.cruise_s, cruise_limit = max_cruise(x, ns, np, motors)
+        segments = mission_segments(x)  # the mission now has the max cruise
+        previous = ["n/a (Np follows from the battery mass budget)"]
+    else:
+        # Battery is SIZED (automatic) or a fixed Np is checked.
+        sizing_mode = "fixed parallel count" if b.parallel_count else "automatic electrical sizing"
+        np, cache = size_parallel_count(x, ns, motors, segments)
+        previous = cache.get(np - 1, (False, ["not evaluated (fixed pack)" if b.parallel_count
+                                              else "minimum count"]))[1]
 
     # Final design: full thermal simulation of mission + every emergency branch.
     loops = design_cooling(x, ns, np, motors)
@@ -222,7 +318,7 @@ def run_model(x: Inputs) -> dict[str, Any]:
     all_rows = list(normal.rows)
     # Emergency branches all start from the same mission checkpoint state; they
     # are independent "what if" cases, not added to the mission energy.
-    for label, alt, state in normal.checkpoints:
+    for label, alt, state in emergency_checkpoints(x, normal.checkpoints):
         for pair in a.emergency_pairs:
             sim = simulate(x, ns, np, loops, motors,
                            [Segment("emergency_hover", a.emergency_s, alt, active=tuple(pair))], state)
@@ -302,8 +398,6 @@ def run_model(x: Inputs) -> dict[str, Any]:
             cruise_shaft_kW=max((r[name + "_shaft_W"] for r in normal.rows if r["phase"] == "cruise"),
                                 default=0) / 1000))
 
-    previous = cache.get(np - 1, (False, ["not evaluated (fixed pack)" if b.parallel_count
-                                          else "minimum count"]))[1]
     return dict(
         model="Albatros III", inputs=asdict(x),
         mtow_kg=a.mass_kg, design_driver=motors.driver,
@@ -318,7 +412,10 @@ def run_model(x: Inputs) -> dict[str, Any]:
         worst_contingency_end_soc=min(e["metrics"]["end_min_group_soc"] for e in emergencies),
         peak_current_nominal_phase=max(normal.rows, key=lambda row: row["cell_A"])["phase"],
         peak_current_nominal_A=max(row["cell_A"] for row in normal.rows),
-        sizing_mode="fixed parallel count" if b.parallel_count else "automatic electrical sizing",
+        sizing_mode=sizing_mode,
+        battery_mass_budget_kg=budget_kg,
+        cruise_s=x.mission.cruise_s, cruise_limit=cruise_limit,
+        range_km=mission_range_km(segments),
         nominal_issues=normal.issues, issues=sorted(issues), warnings=WARNINGS,
         balancing=balance, cooling_loops=[asdict(l) for l in loops],
         cooling_masses_kg=mass_components, cooling_total_kg=cooling_mass,

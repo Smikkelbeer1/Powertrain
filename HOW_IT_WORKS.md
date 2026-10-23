@@ -27,8 +27,14 @@ Contents
 
 The tool answers one question:
 
-> **For this aircraft and this mission, what powertrain do we need, and how
-> much does it weigh?**
+> **For this MTOW and this battery mass, what powertrain do we get, how far
+> can it fly, and how much does the rest of it weigh?**
+
+The battery mass is **given** as a fraction of MTOW (`battery.mass_fraction`,
+from the aircraft design team). The tool fits the biggest pack it can in that
+mass and calculates the **maximum cruise time and range**. The older way of
+working, where the battery is *sized* for a fixed mission, is still available:
+set `battery.mass_fraction = 0` (see §7.2).
 
 "Powertrain" here means everything that is energy related: the battery
 (including BMS and packaging), the four motors (with their integrated
@@ -39,8 +45,10 @@ other departments and enters the tool as an input.
 
 Outputs:
 
-* battery: number of cells in **series** (Ns) and **parallel** (Np), total
-  cell count, energy, mass, volume
+* battery: number of cells in **series** (Ns) and **parallel** (Np) that fit
+  in the battery mass, total cell count, energy, volume
+* the **maximum cruise time and mission range**, and which limit stops a
+  longer flight
 * motors: required peak power, peak torque, rpm, phase current and **mass**
 * cooling: eight sized loops (flow, pump, radiator, fan) and their mass
 * a **volume budget**: the volume of the battery packs, radiators, fans,
@@ -91,11 +99,13 @@ inputs. The steps are:
               │ 1. torque mode? -> find MTOW        │  propulsion.mtow_for_torque
               │ 2. Ns from the voltage ceiling      │  sizing.series_count
               │ 3. motor power, torque and mass     │  propulsion.size_motors
-              │ 4. Np: smallest that flies mission  │  sizing.size_parallel_count
-              │    and every emergency case         │    └─ simulation.simulate (many times)
+              │ 4. Np: largest that fits in the     │  sizing.parallel_from_mass
+              │    battery mass budget              │
+              │    -> longest cruise that passes    │  sizing.max_cruise
+              │    mission + every emergency case   │    └─ simulation.simulate (many times)
               │ 5. size the 8 cooling loops         │  cooling.design_cooling
               │ 6. full simulation incl. temps      │  simulation.simulate
-              │    + 24 emergency branches          │
+              │    + 18 emergency branches          │
               │ 7. mass + volume budget, issues     │  sizing.run_model
               └────────────────────────────────────┘
                                │
@@ -105,56 +115,71 @@ inputs. The steps are:
 
 The most important idea to explain to others:
 
-> **The battery is not sized with a single formula.** The tool *tries*
-> different numbers of parallel cells. For each one it flies the complete
+> **The maximum cruise is not calculated with a single energy formula.** The
+> tool *tries* different cruise times. For each one it flies the complete
 > mission in a time simulation, plus a two-motor emergency starting at every
-> mission phase, and keeps the **smallest** Np for which nothing goes wrong.
-> "Wrong" means: SOC below the reserve, cell current above its maximum, cell
-> or bus voltage too low.
+> airborne mission phase, and keeps the **longest** cruise for which nothing
+> goes wrong. "Wrong" means: SOC below the reserve, cell current above its
+> maximum, cell or bus voltage too low. (In the older automatic mode the same
+> check is used to find the *smallest* Np for a fixed cruise.)
 
 This is more work than an energy formula, but it automatically accounts for
 everything that limits a battery in reality: energy, peak current, voltage
 sag at low SOC, auxiliary loads, cooling power, and the emergency reserve.
+The 750 kg example below shows why that matters: the flight is limited by
+the emergency **current** while half the energy is still in the battery.
 
 ---
 
 ## 4. Worked example: 750 kg
 
-Default inputs, `python -m albatros --mass 750`:
+Default inputs, `python -m albatros --mass 750`. The battery fraction 0.40 is a
+**placeholder**; put the real value in your config.
 
 | Result | Value |
 |---|---|
-| Battery | **190S 25P = 4750 cells**, 77.0 kWh nominal |
-| Cells / battery incl. packaging + BMS | 332.5 kg / 384.1 kg |
-| Motors (4×) | 103.8 kg (inner 29.4 kg, outer 22.5 kg each) |
-| Inverters | integrated in the motors (no separate mass) |
-| Cooling / avionics | 109.8 / 7.6 kg |
-| Total powertrain | 605.3 kg → **144.7 kg left** of the 750 kg |
-| Volume: battery packs / radiators / total | 188.0 L / 107.1 L / 444.9 L |
-| Mission energy from battery | 57.0 kWh |
-| Peak battery power / cell current | 418 kW / 27.4 A (limit 45 A) |
-| Why not 24P? | "SOC reserve": a 24P pack ends an emergency case below 20 % |
+| Battery budget | 0.40 × 750 = **300 kg** |
+| Battery | **190S 19P = 3610 cells**, 58.5 kWh nominal |
+| Cells / pack incl. packaging + BMS | 252.7 kg / 292.3 kg (7.7 kg unused: a 20th string would not fit) |
+| **Max cruise / mission range** | **14.0 min / 79 km** |
+| What stops a longer cruise | `cell current (emergency hover after landing hover)` |
+| Motors (4×) | 103.8 kg (inner 29.4 kg, outer 22.5 kg each), inverters integrated |
+| Cooling / avionics | 108.6 / 7.6 kg |
+| Total powertrain | 512.3 kg → **237.7 kg left** of the 750 kg |
+| Volume: battery packs / radiators / total | 142.9 L / 131.2 L / 446.0 L |
+| Mission energy from battery | 29.6 kWh, ending at 50 % SOC |
 
 Energy per mission phase (from the CSV):
 
 | Phase | Duration | Energy | Peak power |
 |---|---|---|---|
-| take-off hover | 20 s | 1.83 kWh | 330 kW |
-| vertical climb (accelerate, climb, brake) | 16 s | 1.58 kWh | 418 kW |
-| transition | 20 s | 2.26 kWh | 411 kW |
-| climb to 600 m | 180 s | 3.92 kWh | 79 kW |
-| **cruise** | **3000 s** | **38.93 kWh** | 47 kW |
-| descent | 180 s | 0.71 kWh | 15 kW |
-| back-transition | 20 s | 2.26 kWh | 411 kW |
-| landing hover | 30 s | 2.76 kWh | 331 kW |
-| vertical descent | 30 s | 2.75 kWh | 331 kW |
+| take-off hover | 20 s | 1.84 kWh | 332 kW |
+| vertical climb (accelerate, climb, brake) | 16 s | 1.58 kWh | 420 kW |
+| transition | 20 s | 2.26 kWh | 413 kW |
+| climb to 600 m | 180 s | 4.00 kWh | 80 kW |
+| **cruise** | **842 s** | **11.33 kWh** | 48 kW |
+| descent | 180 s | 0.79 kWh | 16 kW |
+| back-transition | 20 s | 2.26 kWh | 413 kW |
+| landing hover | 30 s | 2.77 kWh | 333 kW |
+| vertical descent | 30 s | 2.77 kWh | 333 kW |
 
-Two lessons from this table:
+Lessons from this example:
 
-* **Cruise uses ~2/3 of the energy**, so cruise time, L/D and propeller
-  efficiency are the biggest levers on battery *mass*.
-* **Hover and transition set the peak power**, so they set the motor size
-  and (if the battery is small) the peak cell current.
+* **The flight ends with 50 % SOC left.** Energy is not the problem. The
+  two-rotor emergency needs ~490 kW from the battery, and as the battery
+  empties its voltage drops, so the current rises. Below ~52 % SOC each of
+  the 19 parallel cells would exceed the 45 A limit (§7.5). The levers are:
+  * a higher short-term emergency current (`cell.emergency_max_current_A`),
+    if the cell supplier allows it
+  * more parallel cells (a higher battery fraction)
+  * a different emergency requirement
+* **Hover and transition set the peak power**, so they set the motor size.
+* **Per cruise minute** the aircraft uses ~0.8 kWh. The take-off and landing
+  phases together cost ~14 kWh, no matter how long the cruise is.
+* The radiators are bigger than in the automatic-mode example (131 vs 107 L).
+  The smaller battery carries more current per cell, so it makes more heat.
+* For comparison, the older **automatic mode** (`mass_fraction = 0`, 50 min
+  cruise) needs 190S 24P = 369 kg of battery, limited by `SOC reserve`.
 
 ---
 
@@ -169,7 +194,7 @@ subject. Each field has a default value and a unit in its name.
 
 | Section | Main fields |
 |---|---|
-| `aircraft` | `mass_kg` (MTOW), `diameters_m`, `cruise_kmh`, `emergency_pairs`, `emergency_s`, `emergency_inner_thrust_fraction`, `normal_inner_thrust_fraction`, `tip_mach_limit` |
+| `aircraft` | `mass_kg` (MTOW), `diameters_m`, `cruise_kmh`, `emergency_pairs`, `emergency_s`, `emergency_inner_thrust_fraction`, `emergency_on_ground`, `normal_inner_thrust_fraction`, `tip_mach_limit` |
 | `aerodynamics` | `drag_model` (`"lift_drag"` or `"polar"`), `lift_drag`, `wing_area_m2`, `cd0`, `k_induced` |
 | `propeller` | `model` (`"constant"` or `"coefficients"`), `hover_fm`, `ct_hover`, `cruise_prop_eff`, `cruise_rpm`, tables `J`, `CT`, `CP` |
 | `mission` | heights, climb/descent rates, hover and cruise durations, transition settings, time step `dt_s` |
@@ -179,8 +204,8 @@ subject. Each field has a default value and a unit in its name.
 | Section | Main fields |
 |---|---|
 | `motor` | `peak_torque_Nm` (torque mode), `mass_model` (`"family"`/`"fixed"`), `efficiency`, `rating_margin`, `density_kg_m3` (for volume), thermal data |
-| `cell` | capacity, voltages (max 4.2 / nominal 3.6 / min 2.5 V), max current, resistance, mass, size, OCV table |
-| `battery` | bus voltage window, SOC limits, packaging fraction, fixed Ns/Np overrides |
+| `cell` | capacity, voltages (max 4.2 / nominal 3.6 / min 2.5 V), continuous and emergency max current, resistance, mass, size, OCV table |
+| `battery` | **`mass_fraction`** (battery mass / MTOW, given by aircraft design), bus voltage window, SOC limits, packaging fraction, fixed Ns/Np overrides |
 | `balancing` | passive balancing hardware |
 | `inverter` | `integrated_in_motor` (default `True`), efficiency or detailed SiC loss model, mass/volume if separate, thermal data |
 | `auxiliaries` | flight computers, sensors, actuators, DC/DC |
@@ -331,7 +356,7 @@ dynamics model:
   = "hover"`).
 * The alternative `"rating"` uses a fraction of the motor's peak rating. That
   is what the original Model III did; it was very conservative and made the
-  battery much heavier, see §7.4.
+  battery much heavier, see §7.7.
 * rpm moves linearly from hover rpm to `cruise_rpm` as speed builds up.
 
 **Torque** everywhere is `Q = P/ω` with `ω = 2π·rpm/60`.
@@ -569,7 +594,13 @@ stored. Emergency cases start from these checkpoints.
 
 * `validate`: checks every input before anything runs (see §11.6).
 * `series_count`: Ns, see §7.1.
-* `size_parallel_count`: Np, see §7.2.
+* `parallel_from_mass`: Np from the battery mass budget, see §7.3.
+* `max_cruise`: the longest cruise the battery can fly, see §7.4.
+* `electrical_check`: "does this battery pass the mission and every
+  emergency case?", used by both searches. Returns a list of reasons; an
+  empty list means it passes.
+* `emergency_checkpoints`: which checkpoints get an emergency case (§7.5).
+* `size_parallel_count`: Np in the older automatic mode, see §7.6.
 * `motor_issues`: warns when the motor fit is extrapolated.
 * `run_model`: the procedure from §3, ending in one big result dictionary.
   That dictionary is printed, written to JSON, and used for sweeps.
@@ -665,17 +696,108 @@ If you want to change it:
   for charger tolerance).
 * `battery.bus_max_V` changes the ceiling itself.
 
-### 7.2 Parallel count Np – the search
+### 7.2 Three battery modes
 
-`size_parallel_count` finds the smallest Np that passes all of these:
+`run_model` chooses one of three modes:
 
-1. The normal mission, with no SOC below `minimum_soc` (20 %), no cell above
+| Mode | When | Np | Cruise |
+|---|---|---|---|
+| **Battery mass fraction** (default) | `battery.mass_fraction > 0` | largest that fits in fraction × MTOW | **longest** that passes |
+| Automatic sizing | `battery.mass_fraction = 0` | **smallest** that flies the set mission | `mission.cruise_s` (fixed) |
+| Fixed pack | `battery.parallel_count > 0` | that value | `mission.cruise_s` (fixed), just checked |
+
+The terminal output shows which mode ran (`Sizing mode:`).
+
+### 7.3 Parallel count from the battery mass (default mode)
+
+`parallel_from_mass` uses the same formula as the mass budget:
+
+```
+pack mass = Ns · Np · cell mass · (1 + packaging fraction) + BMS hardware
+          = 190 · Np · 0.070 kg · 1.15                    + 1.7 kg
+```
+
+* The BMS hardware (monitor boards, one balancing channel per series group,
+  master and harness) depends only on Ns, so it is subtracted from the
+  budget first.
+* What's left is divided by the mass of one 190-cell string (15.3 kg) and
+  **rounded down**, because a partial string doesn't fit.
+* At 750 kg: (300 − 1.7) / 15.3 = 19.5 → **19P**, 292.3 kg.
+
+The battery cold plates, TIM and coolant are part of the cooling mass, not of
+the battery fraction.
+
+### 7.4 Maximum cruise: the search
+
+`max_cruise` finds the longest cruise for which `electrical_check` passes. The
+check covers:
+
+1. The normal mission: no SOC below `minimum_soc` (20 %), no cell above
    45 A, no cell below 2.5 V and no bus below 500 V.
 2. A **30 s two-motor emergency hover**, started from the state at the end
-   of **every** mission segment (12 checkpoints × 2 rotor pairs = 24 cases),
-   with the same limits.
+   of every **airborne** mission segment (9 checkpoints × 2 rotor pairs = 18
+   cases), with the same limits, except for the emergency current limit (§7.5).
 
 How it searches:
+
+```
+cruise 0 must pass (otherwise: error "cannot fly the mission even without cruise")
+try 50 min, 100 min, 200 min …   until one fails          (doubling)
+then halve the interval between "passes" and "fails" until it is 1 s wide
+```
+
+This works because a longer cruise can only make things worse: the SOC is
+lower at every later checkpoint. Temperatures are switched off during the
+search (`thermal=False`), which makes it much faster. The full thermal
+simulation of the final mission comes afterwards. The line
+`a longer cruise fails on:` shows which check fails just beyond the maximum,
+and in which case.
+
+**Range** is the horizontal distance of the whole mission (transition, climb,
+cruise, descent, back-transition). Each segment contributes
+`segment.distance() = v0·t + ½·a·t²`, and `mission_range_km` adds them up.
+
+### 7.5 The emergency case and the cell current
+
+The emergency (two rotors carry the whole aircraft for `aircraft.emergency_s`
+= 30 s) is usually the hardest case for the battery. At 750 kg it needs
+~490 kW. The same power at a lower battery voltage means more current:
+
+| SOC | 90 % | 70 % | 55 % | 50 % | 30 % | 20 % |
+|---|---|---|---|---|---|---|
+| Cell current, 19P | 39.8 A | 42.4 A | 44.5 A | **45.3 A** | 48.9 A | 52.6 A |
+
+Two settings control this case:
+
+* **`aircraft.emergency_on_ground`** (default `False`): emergencies are only
+  checked at airborne checkpoints (altitude above 0 m). The checkpoints before
+  take-off, after the take-off hover at ground level and after landing are
+  skipped. A motor failure on the ground just means "don't take off".
+* **`cell.emergency_max_current_A`** (default 45 A): the cell current limit
+  during the emergency, which is short.
+  * The Molicel P45B datasheet only gives **45 A continuous (80 °C
+    cut-off)**. That is a thermal limit, so a higher short-term current is
+    physically plausible, but the datasheet has no pulse rating.
+  * Keep 45 A until the supplier gives one.
+  * As an illustration only, a 60 A limit would raise the 750 kg cruise from
+    14 to 32 min.
+
+Normal flight always uses `cell.max_current_A` (45 A).
+
+Hover power grows with MTOW^1.5, while a battery that is a fixed fraction of
+MTOW grows only linearly. So the heavier the aircraft, the harder the
+emergency gets. With the defaults, 900 kg cannot fly the mission at all
+("cannot fly the mission even without cruise"). A sweep shows where this
+happens:
+
+```bash
+python -m albatros --sweep 600 900 50 --csv out/sweep.csv --save-plot out/sweep.png
+```
+
+### 7.6 Automatic mode: what decides Np
+
+With `battery.mass_fraction = 0`, `size_parallel_count` finds the smallest
+Np that passes `electrical_check` for the set `mission.cruise_s`:
 
 ```
 try Np = 1, 2, 4, 8, 16, 32 …  until one works        (doubling)
@@ -683,30 +805,22 @@ then bisect between the last failure and the first success
 then double-check Np−1, Np−2 … in case the result isn't perfectly monotonic
 ```
 
-Results are cached, so no Np is ever simulated twice. Temperatures are switched
-off during this search (`thermal=False`), because they don't affect the
-electrical limits and the simulation becomes much faster. The thermal check
-happens afterwards, in the final run.
-
-### 7.3 What decides Np: the "why not one fewer" line
-
-The output line `Why not one parallel string fewer:` shows which limit
-Np − 1 violates. That tells you what is driving the battery size:
+Results are cached, so no Np is ever simulated twice. The output line
+`Why not one parallel string fewer:` shows which limit Np − 1 violates. That
+tells you what is driving the battery size. The same messages appear after
+`a longer cruise fails on:` in the default mode:
 
 | Message | Battery is limited by | Levers |
 |---|---|---|
 | `SOC reserve` | **energy** | cruise time, L/D, propeller efficiency, reserve %, cell energy density |
-| `cell current` | **peak power** (cell max 45 A) | transition/hover power, emergency case, cell with higher current rating |
+| `cell current` | **peak power** (cell max 45 A) | transition/hover power, emergency case and its current limit, more parallel cells |
 | `cell voltage` / `bus voltage` | **voltage sag** at low SOC under high load | cell resistance, bus minimum, reserve |
 | `Battery equivalent-circuit maximum power exceeded` | the pack physically can't deliver the power | more cells or a lower-resistance cell |
 
-At 750 kg the default design is limited by `SOC reserve`:
+A message ending in `(emergency hover after …)` means the emergency case
+started at that checkpoint failed; without it, the normal mission failed.
 
-* The normal mission ends at 27.6 % SOC.
-* But the worst emergency case (a two-motor hover started after the end of
-  the mission) ends at 21.1 %, and at 24P it would drop below 20 %.
-
-### 7.4 Why the old version gave ~580 kg
+### 7.7 Why the old version gave ~580 kg
 
 In the original Model III, transition ran every motor at **100 % of its peak
 rating**. That rating is sized for the two-motor emergency (×1.1), so during
@@ -726,7 +840,7 @@ still available with `mission.transition_power_reference = "rating"`.
 
 | Item | How it is computed |
 |---|---|
-| Cells | `Ns · Np · cell.mass_kg` |
+| Cells | `Ns · Np · cell.mass_kg` (in the default mode Np follows from the battery budget) |
 | Battery incl. packaging + BMS | cells × (1 + `noncooling_packaging_fraction` 0.15) + balancing hardware |
 | Motors | sum of the four motor masses (HPDM fit) |
 | Inverters | 0 if `integrated_in_motor` (part of the motor mass), else 4 × `inverter.mass_each_kg` |
@@ -737,10 +851,10 @@ still available with `mission.transition_power_reference = "rating"`.
 rotors, landing gear, payload, etc. If it is negative, the issue
 "accounted subsystem mass exceeds MTOW" is raised.
 
-**MTOW is an input, not a result.** The tool does not iterate "MTOW =
-airframe + payload + powertrain" by itself. To close the loop, sweep MTOW
-(`--sweep`) and pick the MTOW where the remaining mass equals what the other
-departments need.
+**MTOW and battery mass are inputs, not results.** The tool does not iterate
+"MTOW = airframe + payload + powertrain" by itself. Sweep MTOW (`--sweep`)
+to see how range and remaining mass change, and compare that with what the
+other departments need.
 
 ### 8.2 Volume
 
@@ -793,7 +907,7 @@ design; the run still completes.
 | Issue | Meaning |
 |---|---|
 | `SOC reserve` | the weakest group went below `battery.minimum_soc` (only with a fixed Np) |
-| `cell current` | cell current above `cell.max_current_A` |
+| `cell current` | cell current above `cell.max_current_A` (normal flight) or `cell.emergency_max_current_A` (two-rotor emergency) |
 | `cell voltage` | weakest cell below `cell.min_V` under load |
 | `bus voltage` | bus outside `bus_min_V … bus_max_V` |
 | `battery / motor / inverter temperature` | lumped temperature above its limit |
@@ -921,31 +1035,41 @@ silently start from the first one's result.
 
 ### 11.9 Searches by bisection
 
-Np, the MTOW in torque mode, the cruise rpm, and the reduced fan airflow are
-all found by bisection or doubling + bisection.
+Np (automatic mode), the maximum cruise, the MTOW in torque mode, the cruise
+rpm, and the reduced fan airflow are all found by bisection or doubling +
+bisection.
 
 *Why:* each of these quantities moves steadily in one direction. Bisection
 is simple and always converges, and the accuracy is predictable (every step
 halves the uncertainty). It needs no derivatives and no starting guess.
 Fancier solvers (Newton) can diverge.
 
-### 11.10 Fast simulation during sizing, full simulation once
+### 11.10 One check, used by every search
 
-The Np search runs dozens of simulations, with temperatures off and stopping
+`electrical_check` is the single place that decides "does this battery
+pass?". The automatic Np search and the maximum-cruise search both call it.
+
+*Why:* if the rules change (like the emergency settings in §7.5), they change
+for every mode at once, and the modes can never disagree about what
+"passing" means.
+
+### 11.11 Fast simulation during sizing, full simulation once
+
+The searches (max cruise, or Np in automatic mode) run dozens of simulations, with temperatures off and stopping
 at the first electrical violation. Only the final design gets the full
-thermal simulation of the mission and all 24 emergency cases.
+thermal simulation of the mission and all 18 emergency cases.
 
 *Why:* this keeps a design run at a few seconds, which makes sweeps of
 dozens of designs practical.
 
-### 11.11 Time-stepping simulation instead of energy formulas
+### 11.12 Time-stepping simulation instead of energy formulas
 
 *Why:* limits like voltage sag at low SOC, peak current, and temperature
 build-up depend on **when** things happen, not just how much energy is used.
 A time simulation captures this naturally, and it gives the mission CSV, which
 is useful for checking the model and for other departments.
 
-### 11.12 Midpoint time steps and thermal sub-steps
+### 11.13 Midpoint time steps and thermal sub-steps
 
 Powers are evaluated at the middle of each 2 s step. The thermal model splits
 each step into smaller sub-steps when a part heats up quickly.
@@ -954,7 +1078,7 @@ each step into smaller sub-steps when a part heats up quickly.
 no extra cost. Thermal sub-steps keep the temperature integration stable
 without making the whole simulation use tiny steps.
 
-### 11.13 Results as plain dictionaries
+### 11.14 Results as plain dictionaries
 
 `run_model` returns a plain `dict` with numbers, strings and lists.
 
@@ -962,7 +1086,7 @@ without making the whole simulation use tiny steps.
 (Excel, MATLAB, another department's script), and it is easy to add a field
 without breaking anything.
 
-### 11.14 A legacy config and tests to protect the physics
+### 11.15 A legacy config and tests to protect the physics
 
 `configs/legacy_model_III.json` reproduces the original single-file model
 (including separate inverters).
@@ -984,7 +1108,7 @@ rounding-level.
 laws instead of exact numbers means a legitimate input change doesn't break
 them.
 
-### 11.15 Fixed rotor order and per-rotor lists
+### 11.16 Fixed rotor order and per-rotor lists
 
 Every per-rotor quantity is a list of four values in the order
 inner_L, inner_R, outer_L, outer_R (`inputs.NAMES`).
@@ -993,7 +1117,7 @@ inner_L, inner_R, outer_L, outer_R (`inputs.NAMES`).
 motors. One fixed order everywhere avoids mix-ups, and the loops in the code
 stay simple.
 
-### 11.16 Assumptions are printed, not hidden
+### 11.17 Assumptions are printed, not hidden
 
 Placeholder data is marked `PLACEHOLDER` in the code, and model limits are
 listed in the module docstrings. Every run prints its assumption warnings.
@@ -1038,9 +1162,14 @@ After any change, run `python -m pytest`.
 ## 13. Assumptions and limits
 
 * **Transition** is imposed (power and rpm schedule), not a solved flight path.
-* **Emergency:** two rotors hover for 30 s from every mission checkpoint. The
-  battery, bus and cooling are assumed intact, and the hover is reached
-  immediately.
+* **Emergency:** two rotors hover for 30 s from every airborne mission
+  checkpoint.
+  * The battery, bus and cooling are assumed intact, and the hover is
+    reached immediately.
+  * The emergency cell current limit equals the continuous 45 A until a
+    supplier pulse rating is known.
+* **Battery fraction** covers cells, packaging and BMS. Battery cooling
+  hardware is counted under cooling.
 * **Hover** uses momentum theory with a figure of merit. **Descent** uses
   hover power (no energy recovery).
 * **Battery:**

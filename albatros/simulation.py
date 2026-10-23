@@ -67,7 +67,11 @@ def simulate(x: Inputs, ns: int, np: int, loops: list[Loop], motors: MotorSizing
             electrical_issues: set[str] = set()
             if state.soc_min < x.battery.minimum_soc - 1e-9:
                 electrical_issues.add("SOC reserve")
-            if point.current_A / np > x.cell.max_current_A:
+            # Fewer than 4 rotors running = the short two-rotor emergency, which
+            # may use the (higher) short-term cell current limit.
+            emergency = len(s.active) < 4
+            current_limit = x.cell.emergency_max_current_A if emergency else x.cell.max_current_A
+            if point.current_A / np > current_limit:
                 electrical_issues.add("cell current")
             if point.min_cell_V < x.cell.min_V:
                 electrical_issues.add("cell voltage")

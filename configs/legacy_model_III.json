@@ -1,5 +1,5 @@
 {
-  "_comment": "Reproduces the original single-file albatros_model_III.py: fixed 40 kg motors, separate inverters, constant propeller efficiency, a single L/D and transition power as a fraction of the motor rating.",
+  "_comment": "Reproduces (with automatic battery sizing) the original single-file albatros_model_III.py: fixed 40 kg motors, separate inverters, constant propeller efficiency, a single L/D and transition power as a fraction of the motor rating.",
   "motor": {
     "mass_model": "fixed",
     "mass_each_kg": [
@@ -23,5 +23,11 @@
   },
   "inverter": {
     "integrated_in_motor": false
+  },
+  "battery": {
+    "mass_fraction": 0.0
+  },
+  "aircraft": {
+    "emergency_on_ground": true
   }
 }
