@@ -1,0 +1,20 @@
+[project]
+name = "albatros"
+version = "3.1.0"
+description = "Albatros Model III - conceptual eVTOL powertrain sizing"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.optional-dependencies]
+plot = ["matplotlib>=3.7"]
+dev = ["pytest>=7"]
+
+[project.scripts]
+albatros = "albatros.cli:main"
+
+[tool.setuptools]
+packages = ["albatros"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

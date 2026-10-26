@@ -1,0 +1,27 @@
+{
+  "_comment": "Template for the numbers delivered by other departments. All values below are PLACEHOLDERS: replace them with the real data. Anything not listed here keeps its default from albatros/inputs.py.",
+  "aircraft": {
+    "mass_kg": 750.0,
+    "diameters_m": [1.47, 1.47, 1.04, 1.04],
+    "cruise_kmh": 234.0
+  },
+  "aerodynamics": {
+    "_comment": "drag = q*S*(cd0 + k_induced*CL^2), CL = W/(q*S)",
+    "drag_model": "polar",
+    "wing_area_m2": 12.0,
+    "cd0": 0.012,
+    "k_induced": 0.035
+  },
+  "propeller": {
+    "_comment": "CT = T/(rho n^2 D^4), CP = P/(rho n^3 D^5), J = V/(n D), n in rev/s. J must start at 0.",
+    "model": "coefficients",
+    "J":  [0.0,    0.2,    0.4,    0.6,    0.8,    1.0,    1.2],
+    "CT": [0.100,  0.085,  0.070,  0.055,  0.040,  0.025,  0.010],
+    "CP": [0.0394, 0.0425, 0.0452, 0.0446, 0.0400, 0.0321, 0.0218],
+    "cruise_rpm": 3061.0
+  },
+  "mission": {
+    "cruise_s": 3000.0,
+    "cruise_height_m": 600.0
+  }
+}
