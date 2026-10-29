@@ -1,0 +1,2986 @@
+{
+  "schema_version": 1,
+  "currency": "EUR",
+  "price_date": "2026-10-29",
+  "tax_basis": "excluding VAT, freight and import duties",
+  "scope": "Full-size Albatross powertrain, rotors and liquid cooling; motors excluded. Optional gearbox/tilt/FCC items use explicit counts. This is a preliminary BOM, not a released aircraft BOM.",
+  "categories": [
+    {
+      "id": "cells",
+      "title": "Battery cells",
+      "unit": "cell",
+      "quantity_basis": "cells",
+      "notes": "Rerun the electrical/thermal model for a changed cell; identical cell count is not an equivalent pack.",
+      "products": [
+        {
+          "id": "cells_1",
+          "name": "Molicel INR-21700-P45B",
+          "unit": "cell",
+          "price_eur": {
+            "low": 3.14,
+            "base": 3.93,
+            "high": 4.91
+          },
+          "price_status": "published",
+          "price_source": "https://www.nkon.nl/rechargeable/li-ion.html?buttontop=Flat+top&protected=Zonder&stock_availability=Op+voorraad",
+          "price_basis": "Single-unit listing, excluding VAT; range is sensitivity, not a quoted price range.",
+          "technical_source": "https://www.molicel.com/product/",
+          "checked_on": "2026-10-29",
+          "rationale": "Closest to inherited P45B-like model; validate the assumed resistance map.",
+          "qualification": "unverified_for_flight",
+          "cell_model": "P45B",
+          "capacity_Ah": 4.5
+        },
+        {
+          "id": "cells_2",
+          "name": "Molicel INR-21700-P50B",
+          "unit": "cell",
+          "price_eur": {
+            "low": 4.46,
+            "base": 5.58,
+            "high": 6.97
+          },
+          "price_status": "published",
+          "price_source": "https://www.nkon.nl/rechargeable/li-ion.html?buttontop=Flat+top&protected=Zonder&stock_availability=Op+voorraad",
+          "price_basis": "Single-unit listing, excluding VAT; range is sensitivity, not a quoted price range.",
+          "technical_source": "https://www.molicel.com/product/",
+          "checked_on": "2026-10-29",
+          "rationale": "Higher nominal capacity in the same format; new heat and ageing data needed.",
+          "qualification": "unverified_for_flight",
+          "cell_model": "P50B",
+          "capacity_Ah": 5
+        },
+        {
+          "id": "cells_3",
+          "name": "Molicel INR-21700-P42A",
+          "unit": "cell",
+          "price_eur": {
+            "low": 1.98,
+            "base": 2.47,
+            "high": 3.09
+          },
+          "price_status": "published",
+          "price_source": "https://www.nkon.nl/rechargeable/li-ion.html?brand%5B0%5D=Xtar&brand%5B1%5D=Molicel&ratings_summary=0",
+          "price_basis": "Single-unit listing, excluding VAT; range is sensitivity, not a quoted price range.",
+          "technical_source": "https://www.molicel.com/product/",
+          "checked_on": "2026-10-29",
+          "rationale": "Lower initial purchase cost; lower energy per cell may increase parallel count.",
+          "qualification": "unverified_for_flight",
+          "cell_model": "P42A",
+          "capacity_Ah": 4.2
+        },
+        {
+          "id": "cells_4",
+          "name": "Molicel INR-21700-P60C",
+          "unit": "cell",
+          "price_eur": {
+            "low": 5.0,
+            "base": 10,
+            "high": 20
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.molicel.com/product/",
+          "checked_on": "2026-10-29",
+          "rationale": "Candidate for energy-sensitive wing packaging; obtain production availability and full data.",
+          "qualification": "unverified_for_flight",
+          "cell_model": "P60C"
+        },
+        {
+          "id": "cells_5",
+          "name": "Molicel INR-18650-P30B",
+          "unit": "cell",
+          "price_eur": {
+            "low": 2.5,
+            "base": 5,
+            "high": 10
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.molicel.com/product/",
+          "checked_on": "2026-10-29",
+          "rationale": "Smaller cell can aid packaging; requires new holders, cooling geometry and cell count.",
+          "qualification": "unverified_for_flight",
+          "cell_model": "P30B",
+          "capacity_Ah": 3
+        }
+      ]
+    },
+    {
+      "id": "bms_master",
+      "title": "BMS controller",
+      "unit": "controller",
+      "quantity_basis": "packs",
+      "notes": "Controller-only prices; matching monitor boards, harness and current sensing are separate. Passive balancing included; no separate balancing board charge. Default one series string, not two independent packs.",
+      "products": [
+        {
+          "id": "bms_master_1",
+          "name": "Sensata LiTHIUM BALANCE n-BMS master",
+          "unit": "controller",
+          "price_eur": {
+            "low": 700.0,
+            "base": 1400,
+            "high": 2800
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://lithiumbalance.com/products/n-bms/",
+          "checked_on": "2026-10-29",
+          "rationale": "Distributed architecture supports wing modules; check installed channel count, isolation and failure response.",
+          "qualification": "unverified_for_flight",
+          "bms_family": "nbms",
+          "max_voltage_V": 1000
+        },
+        {
+          "id": "bms_master_2",
+          "name": "Sensata LiTHIUM BALANCE n3-BMS master",
+          "unit": "controller",
+          "price_eur": {
+            "low": 1100.0,
+            "base": 2200,
+            "high": 4400
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://lithiumbalance.com/products/n3-bms-battery-management-system-bms/",
+          "checked_on": "2026-10-29",
+          "rationale": "Distributed architecture supports wing modules; check installed channel count, isolation and failure response.",
+          "qualification": "unverified_for_flight",
+          "bms_family": "n3bms",
+          "max_voltage_V": 1000
+        },
+        {
+          "id": "bms_master_3",
+          "name": "Prohelion D1000 Gen2 master",
+          "unit": "controller",
+          "price_eur": {
+            "low": 600.0,
+            "base": 1200,
+            "high": 2400
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://docs.prohelion.com/Battery_Management_Systems/Prohelion_BMS_D1000_Gen2/index.html",
+          "checked_on": "2026-10-29",
+          "rationale": "Distributed architecture supports wing modules; check installed channel count, isolation and failure response.",
+          "qualification": "unverified_for_flight",
+          "bms_family": "d1000g2",
+          "max_voltage_V": 1000
+        },
+        {
+          "id": "bms_master_4",
+          "name": "Prohelion D1000 Gen1 master",
+          "unit": "controller",
+          "price_eur": {
+            "low": 250.0,
+            "base": 500,
+            "high": 1000
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://docs.prohelion.com/Battery_Management_Systems/Prohelion_BMS_D1000_Gen1/index.html",
+          "checked_on": "2026-10-29",
+          "rationale": "Distributed architecture supports wing modules; check installed channel count, isolation and failure response.",
+          "qualification": "unverified_for_flight",
+          "bms_family": "d1000g1",
+          "max_voltage_V": 1000
+        },
+        {
+          "id": "bms_master_5",
+          "name": "EMUS G1 CCGM master",
+          "unit": "controller",
+          "price_eur": {
+            "low": 300.0,
+            "base": 600,
+            "high": 1200
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://emusbms.com/helpie_faq_page/",
+          "checked_on": "2026-10-29",
+          "rationale": "Distributed architecture supports wing modules; check installed channel count, isolation and failure response.",
+          "qualification": "unverified_for_flight",
+          "bms_family": "emus",
+          "max_voltage_V": 1300
+        }
+      ]
+    },
+    {
+      "id": "bms_monitor",
+      "title": "BMS cell-monitor / balancing boards",
+      "unit": "board",
+      "quantity_basis": "bms_boards",
+      "notes": "Round up channels separately for every physically separate battery section. Boards must match the selected master.",
+      "products": [
+        {
+          "id": "bms_monitor_1",
+          "name": "Sensata LiTHIUM BALANCE n-BMS cell-monitor board",
+          "unit": "board",
+          "price_eur": {
+            "low": 90.0,
+            "base": 180,
+            "high": 360
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://lithiumbalance.com/products/n-bms/",
+          "checked_on": "2026-10-29",
+          "rationale": "12 channels per board for costing; check exact revision, temperature channels and balancing duty.",
+          "qualification": "unverified_for_flight",
+          "bms_family": "nbms",
+          "channels": 12
+        },
+        {
+          "id": "bms_monitor_2",
+          "name": "Sensata LiTHIUM BALANCE n3-BMS cell-monitor board",
+          "unit": "board",
+          "price_eur": {
+            "low": 120.0,
+            "base": 240,
+            "high": 480
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://lithiumbalance.com/products/n3-bms-battery-management-system-bms/",
+          "checked_on": "2026-10-29",
+          "rationale": "12 channels per board for costing; check exact revision, temperature channels and balancing duty.",
+          "qualification": "unverified_for_flight",
+          "bms_family": "n3bms",
+          "channels": 12
+        },
+        {
+          "id": "bms_monitor_3",
+          "name": "Prohelion D1000 Gen2 cell-monitor board",
+          "unit": "board",
+          "price_eur": {
+            "low": 130.0,
+            "base": 260,
+            "high": 520
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://docs.prohelion.com/Battery_Management_Systems/Prohelion_BMS_D1000_Gen2/index.html",
+          "checked_on": "2026-10-29",
+          "rationale": "14 channels per board for costing; check exact revision, temperature channels and balancing duty.",
+          "qualification": "unverified_for_flight",
+          "bms_family": "d1000g2",
+          "channels": 14
+        },
+        {
+          "id": "bms_monitor_4",
+          "name": "Prohelion D1000 Gen1 cell-monitor board",
+          "unit": "board",
+          "price_eur": {
+            "low": 110.0,
+            "base": 220,
+            "high": 440
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://docs.prohelion.com/Battery_Management_Systems/Prohelion_BMS_D1000_Gen1/index.html",
+          "checked_on": "2026-10-29",
+          "rationale": "8 channels per board for costing; check exact revision, temperature channels and balancing duty.",
+          "qualification": "unverified_for_flight",
+          "bms_family": "d1000g1",
+          "channels": 8
+        },
+        {
+          "id": "bms_monitor_5",
+          "name": "EMUS G1 CCGM cell-monitor board",
+          "unit": "board",
+          "price_eur": {
+            "low": 90.0,
+            "base": 180,
+            "high": 360
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://emusbms.com/helpie_faq_page/",
+          "checked_on": "2026-10-29",
+          "rationale": "16 channels per board for costing; check exact revision, temperature channels and balancing duty.",
+          "qualification": "unverified_for_flight",
+          "bms_family": "emus",
+          "channels": 16
+        }
+      ]
+    },
+    {
+      "id": "inverter",
+      "title": "Separate propulsion inverter",
+      "unit": "inverter",
+      "quantity_basis": "inverters",
+      "notes": "Zero quantity if integrated into motor purchase. Inverter cold plate assumed integrated unless overridden. Peak power is not a 120-second hover rating. Exact motor compatibility remains open.",
+      "products": [
+        {
+          "id": "inverter_1",
+          "name": "Cascadia Motion CM350SiC",
+          "unit": "inverter",
+          "price_eur": {
+            "low": 6000.0,
+            "base": 12000,
+            "high": 24000
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.cascadiamotion.com/cm-350sic",
+          "checked_on": "2026-10-29",
+          "rationale": "Published 850 V operating ceiling; phase-current and thermal duration must be matched.",
+          "qualification": "unverified_for_flight",
+          "max_voltage_V": 850
+        },
+        {
+          "id": "inverter_2",
+          "name": "Motion Applied MCU-400",
+          "unit": "inverter",
+          "price_eur": {
+            "low": 8000.0,
+            "base": 16000,
+            "high": 32000
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.motionapplied.com/products",
+          "checked_on": "2026-10-29",
+          "rationale": "Compact SiC option; obtain operating voltage range and continuous-current map.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "inverter_3",
+          "name": "Motion Applied MCU-600",
+          "unit": "inverter",
+          "price_eur": {
+            "low": 10000.0,
+            "base": 20000,
+            "high": 40000
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.motionapplied.com/products",
+          "checked_on": "2026-10-29",
+          "rationale": "Higher peak current in compact housing; obtain full thermal envelope.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "inverter_4",
+          "name": "Motion Applied MCU-800",
+          "unit": "inverter",
+          "price_eur": {
+            "low": 12000.0,
+            "base": 24000,
+            "high": 48000
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.motionapplied.com/products",
+          "checked_on": "2026-10-29",
+          "rationale": "Higher peak-current headroom; verify continuous rating and control support.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "inverter_5",
+          "name": "Motion Applied MCU-X platform",
+          "unit": "inverter",
+          "price_eur": {
+            "low": 11000.0,
+            "base": 22000,
+            "high": 44000
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.motionapplied.com/products",
+          "checked_on": "2026-10-29",
+          "rationale": "Configurable platform route for integrating the drive; engineering/NRE quote required.",
+          "qualification": "unverified_for_flight"
+        }
+      ]
+    },
+    {
+      "id": "battery_plate",
+      "title": "Battery cold-plate assemblies",
+      "unit": "m2 wetted/contact layout allowance",
+      "quantity_basis": "battery_plate_area",
+      "notes": "Custom products, not stocked SKUs. Cost per layout area is an AUTHOR normalisation. Design cylindrical side-contact geometry, manifolds and electrical barriers together; a flat plate alone is not a validated replacement.",
+      "products": [
+        {
+          "id": "battery_plate_1",
+          "name": "Boyd aluminium vacuum-brazed custom plate",
+          "unit": "m2 wetted/contact layout allowance",
+          "price_eur": {
+            "low": 900.0,
+            "base": 1800,
+            "high": 3600
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://info.boydcorp.com/hubfs/Thermal/Liquid-Cooling/Boyd-Legacy-Liquid-Cooled-Cold-Plates-Technical-Datasheet.pdf",
+          "checked_on": "2026-10-29",
+          "rationale": "Lightweight custom flow passages; specify ribbed or ribbon contact for cylindrical cells.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "battery_plate_2",
+          "name": "Boyd copper tube-in custom plate",
+          "unit": "m2 wetted/contact layout allowance",
+          "price_eur": {
+            "low": 750.0,
+            "base": 1500,
+            "high": 3000
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://info.boydcorp.com/hubfs/Thermal/Liquid-Cooling/Boyd-Legacy-Liquid-Cooled-Cold-Plates-Technical-Datasheet.pdf",
+          "checked_on": "2026-10-29",
+          "rationale": "Prototyping route using continuous tubing; copper adds mass and mixed-metal concerns.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "battery_plate_3",
+          "name": "Boyd stainless-steel tube-in custom plate",
+          "unit": "m2 wetted/contact layout allowance",
+          "price_eur": {
+            "low": 1050.0,
+            "base": 2100,
+            "high": 4200
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://info.boydcorp.com/hubfs/Thermal/Liquid-Cooling/Boyd-Legacy-Liquid-Cooled-Cold-Plates-Technical-Datasheet.pdf",
+          "checked_on": "2026-10-29",
+          "rationale": "Corrosion-resistant fluid path; heat spreading and mass need checking.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "battery_plate_4",
+          "name": "Boyd copper-nickel tube-in custom plate",
+          "unit": "m2 wetted/contact layout allowance",
+          "price_eur": {
+            "low": 1100.0,
+            "base": 2200,
+            "high": 4400
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://info.boydcorp.com/hubfs/Thermal/Liquid-Cooling/Boyd-Legacy-Liquid-Cooled-Cold-Plates-Technical-Datasheet.pdf",
+          "checked_on": "2026-10-29",
+          "rationale": "Alternative wetted-metal choice; evaluate thermal penalty and material compatibility.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "battery_plate_5",
+          "name": "Dana custom battery cold plate",
+          "unit": "m2 wetted/contact layout allowance",
+          "price_eur": {
+            "low": 900.0,
+            "base": 1800,
+            "high": 3600
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.dana.com/product/battery-cold-plate",
+          "checked_on": "2026-10-29",
+          "rationale": "Lightweight aluminium battery-specific manufacturing route; cylindrical contact adaptation required.",
+          "qualification": "unverified_for_flight"
+        }
+      ]
+    },
+    {
+      "id": "inverter_plate",
+      "title": "Additional inverter cold plates",
+      "unit": "plate",
+      "quantity_basis": "external_inverter_plates",
+      "notes": "Only for an inverter without an included cooler. Listed standard plates are prototype candidates, not proven at inverter loss. Set mounting and pressure-drop requirements.",
+      "products": [
+        {
+          "id": "inverter_plate_1",
+          "name": "Boyd 416101U00000G",
+          "unit": "plate",
+          "price_eur": {
+            "low": 68.79,
+            "base": 85.99,
+            "high": 107.49
+          },
+          "price_status": "published",
+          "price_source": "https://www.digikey.be/en/videos/a/aavid-thermalloy/hi-contact-liquid-cold-plates",
+          "price_basis": "Single-unit listing, excluding VAT; range is sensitivity, not a quoted price range.",
+          "technical_source": "https://info.boydcorp.com/hubfs/Thermal/Liquid-Cooling/Boyd-Legacy-Liquid-Cooled-Cold-Plates-Technical-Datasheet.pdf",
+          "checked_on": "2026-10-29",
+          "rationale": "Compact six-pass plate for bench fit checks.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "inverter_plate_2",
+          "name": "Boyd 416201U00000G",
+          "unit": "plate",
+          "price_eur": {
+            "low": 116.78,
+            "base": 145.97,
+            "high": 182.46
+          },
+          "price_status": "published",
+          "price_source": "https://www.digikey.be/en/videos/a/aavid-thermalloy/hi-contact-liquid-cold-plates",
+          "price_basis": "Single-unit listing, excluding VAT; range is sensitivity, not a quoted price range.",
+          "technical_source": "https://info.boydcorp.com/hubfs/Thermal/Liquid-Cooling/Boyd-Legacy-Liquid-Cooled-Cold-Plates-Technical-Datasheet.pdf",
+          "checked_on": "2026-10-29",
+          "rationale": "Longer six-pass footprint can suit a long nacelle.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "inverter_plate_3",
+          "name": "Boyd 416301U00000G",
+          "unit": "plate",
+          "price_eur": {
+            "low": 198.71,
+            "base": 248.39,
+            "high": 310.49
+          },
+          "price_status": "published",
+          "price_source": "https://www.digikey.be/en/videos/a/aavid-thermalloy/hi-contact-liquid-cold-plates",
+          "price_basis": "Single-unit listing, excluding VAT; range is sensitivity, not a quoted price range.",
+          "technical_source": "https://info.boydcorp.com/hubfs/Thermal/Liquid-Cooling/Boyd-Legacy-Liquid-Cooled-Cold-Plates-Technical-Datasheet.pdf",
+          "checked_on": "2026-10-29",
+          "rationale": "Long six-pass footprint spreads heat over greater length.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "inverter_plate_4",
+          "name": "Boyd 416401U00000G",
+          "unit": "plate",
+          "price_eur": {
+            "low": 80.5,
+            "base": 100.62,
+            "high": 125.78
+          },
+          "price_status": "published",
+          "price_source": "https://www.digikey.be/en/videos/a/aavid-thermalloy/hi-contact-liquid-cold-plates",
+          "price_basis": "Single-unit listing, excluding VAT; range is sensitivity, not a quoted price range.",
+          "technical_source": "https://info.boydcorp.com/hubfs/Thermal/Liquid-Cooling/Boyd-Legacy-Liquid-Cooled-Cold-Plates-Technical-Datasheet.pdf",
+          "checked_on": "2026-10-29",
+          "rationale": "Alternative standard footprint; higher thermal resistance limits load.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "inverter_plate_5",
+          "name": "Boyd 416501U00000G",
+          "unit": "plate",
+          "price_eur": {
+            "low": 67.47,
+            "base": 84.34,
+            "high": 105.43
+          },
+          "price_status": "published",
+          "price_source": "https://www.digikey.be/en/videos/a/aavid-thermalloy/hi-contact-liquid-cold-plates",
+          "price_basis": "Single-unit listing, excluding VAT; range is sensitivity, not a quoted price range.",
+          "technical_source": "https://info.boydcorp.com/hubfs/Thermal/Liquid-Cooling/Boyd-Legacy-Liquid-Cooled-Cold-Plates-Technical-Datasheet.pdf",
+          "checked_on": "2026-10-29",
+          "rationale": "Alternative compact plate for lower-loss electronics.",
+          "qualification": "unverified_for_flight"
+        }
+      ]
+    },
+    {
+      "id": "radiator",
+      "title": "Liquid-to-air radiator cores",
+      "unit": "core",
+      "quantity_basis": "loops",
+      "notes": "Core-only allowance. Match UA at actual coolant/air temperatures, air and liquid pressure drops, and nacelle dimensions. No generic kW rating establishes fit.",
+      "products": [
+        {
+          "id": "radiator_1",
+          "name": "PWR custom aerospace liquid-air core",
+          "unit": "core",
+          "price_eur": {
+            "low": 1750.0,
+            "base": 3500,
+            "high": 7000
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.pwr.com.au/app/uploads/2025/08/PWR-2025-Annual-Report.pdf",
+          "checked_on": "2026-10-29",
+          "rationale": "Supplier reports eVTOL thermal-system projects; custom long/narrow core route.",
+          "qualification": "unverified_for_flight",
+          "custom": true
+        },
+        {
+          "id": "radiator_2",
+          "name": "Conflux aviation air-liquid heat exchanger",
+          "unit": "core",
+          "price_eur": {
+            "low": 3000.0,
+            "base": 6000,
+            "high": 12000
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.confluxtechnology.com/industry/aviation/",
+          "checked_on": "2026-10-29",
+          "rationale": "Additive manufacture offers nacelle packaging flexibility; obtain pressure-loss and mass quote.",
+          "qualification": "unverified_for_flight",
+          "custom": true
+        },
+        {
+          "id": "radiator_3",
+          "name": "Boyd 4220G10",
+          "unit": "core",
+          "price_eur": {
+            "low": 600.0,
+            "base": 1200,
+            "high": 2400
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://info.boydcorp.com/hubfs/Thermal/Liquid-Cooling/Boyd-Stainless-Steel-Tube-Fin-Heat-Exchangers.pdf",
+          "checked_on": "2026-10-29",
+          "rationale": "Documented stainless tube-fin core; prototype candidate if UA and envelope match.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "radiator_4",
+          "name": "Boyd 4310G10",
+          "unit": "core",
+          "price_eur": {
+            "low": 750.0,
+            "base": 1500,
+            "high": 3000
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://info.boydcorp.com/hubfs/Thermal/Liquid-Cooling/Boyd-Stainless-Steel-Tube-Fin-Heat-Exchangers.pdf",
+          "checked_on": "2026-10-29",
+          "rationale": "Larger stock core route for experimental loop validation; mass may be unattractive.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "radiator_5",
+          "name": "Boyd 4320G10",
+          "unit": "core",
+          "price_eur": {
+            "low": 1000.0,
+            "base": 2000,
+            "high": 4000
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://info.boydcorp.com/hubfs/Thermal/Liquid-Cooling/Boyd-Stainless-Steel-Tube-Fin-Heat-Exchangers.pdf",
+          "checked_on": "2026-10-29",
+          "rationale": "Larger two-fan layout; test envelope and thermal performance before selection.",
+          "qualification": "unverified_for_flight"
+        }
+      ]
+    },
+    {
+      "id": "pump",
+      "title": "Electric coolant pumps",
+      "unit": "pump",
+      "quantity_basis": "loops",
+      "notes": "Automotive prototype candidates. Published free-flow litres/minute is NOT flow at required pump head. Default model head may exceed these pumps; strict selection requires a measured curve.",
+      "products": [
+        {
+          "id": "pump_1",
+          "name": "Davies Craig EWP80 kit #8009 12V",
+          "unit": "pump",
+          "price_eur": {
+            "low": 90.0,
+            "base": 180,
+            "high": 360
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://daviescraig.com/electric-water-pumps",
+          "checked_on": "2026-10-29",
+          "rationale": "Small-loop prototype route; check head and continuous service.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "pump_2",
+          "name": "Davies Craig EWP115 nylon kit #8025 12V",
+          "unit": "pump",
+          "price_eur": {
+            "low": 105.0,
+            "base": 210,
+            "high": 420
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://daviescraig.com/electric-water-pumps",
+          "checked_on": "2026-10-29",
+          "rationale": "Lower-mass housing candidate; coolant and temperature limits need checking.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "pump_3",
+          "name": "Davies Craig EWP115 alloy kit #8040 12V",
+          "unit": "pump",
+          "price_eur": {
+            "low": 115.0,
+            "base": 230,
+            "high": 460
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://daviescraig.com/electric-water-pumps",
+          "checked_on": "2026-10-29",
+          "rationale": "Metal housing for integration studies; check electrical protection.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "pump_4",
+          "name": "Davies Craig EWP150 kit #8060 12V",
+          "unit": "pump",
+          "price_eur": {
+            "low": 130.0,
+            "base": 260,
+            "high": 520
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://daviescraig.com/electric-water-pumps",
+          "checked_on": "2026-10-29",
+          "rationale": "Higher free-flow capability; does not establish sufficient pressure head.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "pump_5",
+          "name": "Davies Craig EWP150 kit #8061 24V",
+          "unit": "pump",
+          "price_eur": {
+            "low": 140.0,
+            "base": 280,
+            "high": 560
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://daviescraig.com/electric-water-pumps",
+          "checked_on": "2026-10-29",
+          "rationale": "Fits a 24 V auxiliary architecture if hydraulic curve meets the loop.",
+          "qualification": "unverified_for_flight"
+        }
+      ]
+    },
+    {
+      "id": "fan",
+      "title": "Radiator fan / blower",
+      "unit": "fan",
+      "quantity_basis": "fans",
+      "notes": "One fan per loop is only a budget count. Confirm pressure-flow curve at hover; axial fans may fail the 500\u20131000 Pa requirement. Custom blower could replace the entire choice.",
+      "products": [
+        {
+          "id": "fan_1",
+          "name": "SPAL VA117-ABL506P-103A",
+          "unit": "fan",
+          "price_eur": {
+            "low": 175.0,
+            "base": 350,
+            "high": 700
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://test.spalautomotive.com/documents/20182/94723/brushless_catalogue.pdf/011138a9-0a3f-4ada-9dc6-31560ef69104",
+          "checked_on": "2026-10-29",
+          "rationale": "Brushless 12 V fan family; larger face area may conflict with nacelle.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "fan_2",
+          "name": "SPAL VA97-ABL322P/N-103A",
+          "unit": "fan",
+          "price_eur": {
+            "low": 150.0,
+            "base": 300,
+            "high": 600
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://test.spalautomotive.com/documents/20182/94723/brushless_catalogue.pdf/011138a9-0a3f-4ada-9dc6-31560ef69104",
+          "checked_on": "2026-10-29",
+          "rationale": "Lower-power brushless candidate for lower-resistance core.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "fan_3",
+          "name": "SPAL VA97-BBL339P/N-103A",
+          "unit": "fan",
+          "price_eur": {
+            "low": 160.0,
+            "base": 320,
+            "high": 640
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://test.spalautomotive.com/documents/20182/94723/brushless_catalogue.pdf/011138a9-0a3f-4ada-9dc6-31560ef69104",
+          "checked_on": "2026-10-29",
+          "rationale": "24 V brushless candidate; useful with a 24 V auxiliary bus.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "fan_4",
+          "name": "SPAL VA164-ABL806HT/R-116A",
+          "unit": "fan",
+          "price_eur": {
+            "low": 250.0,
+            "base": 500,
+            "high": 1000
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://test.spalautomotive.com/documents/20182/94723/brushless_catalogue.pdf/011138a9-0a3f-4ada-9dc6-31560ef69104",
+          "checked_on": "2026-10-29",
+          "rationale": "Higher-power fan route; likely large for the nacelle.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "fan_5",
+          "name": "SPAL VA164A-ABL1002HT/R-124A",
+          "unit": "fan",
+          "price_eur": {
+            "low": 325.0,
+            "base": 650,
+            "high": 1300
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://test.spalautomotive.com/documents/20182/94723/brushless_catalogue.pdf/011138a9-0a3f-4ada-9dc6-31560ef69104",
+          "checked_on": "2026-10-29",
+          "rationale": "High-power fan route for forced-air trials; packaging and pressure-flow verification essential.",
+          "qualification": "unverified_for_flight"
+        }
+      ]
+    },
+    {
+      "id": "hose",
+      "title": "Coolant hose / tubing",
+      "unit": "m",
+      "quantity_basis": "hose_m",
+      "notes": "Lengths include supply and return. Choose ID from hydraulic model; suffix, pressure, bend radius, permeation and vibration qualification still required.",
+      "products": [
+        {
+          "id": "hose_1",
+          "name": "Parker 7395 E-Z Form",
+          "unit": "m",
+          "price_eur": {
+            "low": 12.5,
+            "base": 25,
+            "high": 50
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://discover.parker.com/Coolant-Distribution-System",
+          "checked_on": "2026-10-29",
+          "rationale": "Formable hose suits curved nacelle routing.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "hose_2",
+          "name": "Parker 7181",
+          "unit": "m",
+          "price_eur": {
+            "low": 7.0,
+            "base": 14,
+            "high": 28
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://discover.parker.com/Coolant-Distribution-System",
+          "checked_on": "2026-10-29",
+          "rationale": "Heater/coolant hose option for short flexible routes.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "hose_3",
+          "name": "Parker 801 Push-Lok",
+          "unit": "m",
+          "price_eur": {
+            "low": 9.0,
+            "base": 18,
+            "high": 36
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://discover.parker.com/Coolant-Distribution-System",
+          "checked_on": "2026-10-29",
+          "rationale": "Assembly-friendly hose route with matching approved fittings.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "hose_4",
+          "name": "Parker 804 Push-Lok",
+          "unit": "m",
+          "price_eur": {
+            "low": 10.0,
+            "base": 20,
+            "high": 40
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://discover.parker.com/Coolant-Distribution-System",
+          "checked_on": "2026-10-29",
+          "rationale": "Alternative coolant distribution hose; check temperature and coolant compatibility.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "hose_5",
+          "name": "Parker ECH",
+          "unit": "m",
+          "price_eur": {
+            "low": 14.0,
+            "base": 28,
+            "high": 56
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://discover.parker.com/Coolant-Distribution-System",
+          "checked_on": "2026-10-29",
+          "rationale": "Electronic cooling hose family targets battery thermal distribution.",
+          "qualification": "unverified_for_flight"
+        }
+      ]
+    },
+    {
+      "id": "quick_disconnect",
+      "title": "Coolant dry-break couplings",
+      "unit": "mated pair",
+      "quantity_basis": "qd_pairs",
+      "notes": "Prices cover both halves as an allowance. Connection diameter, coolant seals and actual pressure drop must be specified.",
+      "products": [
+        {
+          "id": "quick_disconnect_1",
+          "name": "CPC Everis LQ2",
+          "unit": "mated pair",
+          "price_eur": {
+            "low": 45.0,
+            "base": 90,
+            "high": 180
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.cpcworldwide.com/Portals/0/Downloadable-Content/TRM/Literature/Catalogs/CPC-Liquid-Cooling-Catalog.pdf",
+          "checked_on": "2026-10-29",
+          "rationale": "Small branches; likely restrictive for the main loop.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "quick_disconnect_2",
+          "name": "CPC Everis LQ4",
+          "unit": "mated pair",
+          "price_eur": {
+            "low": 60.0,
+            "base": 120,
+            "high": 240
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.cpcworldwide.com/Portals/0/Downloadable-Content/TRM/Literature/Catalogs/CPC-Liquid-Cooling-Catalog.pdf",
+          "checked_on": "2026-10-29",
+          "rationale": "Intermediate bore for modest flows.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "quick_disconnect_3",
+          "name": "CPC Everis LQ4S",
+          "unit": "mated pair",
+          "price_eur": {
+            "low": 70.0,
+            "base": 140,
+            "high": 280
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.cpcworldwide.com/Portals/0/Downloadable-Content/TRM/Literature/Catalogs/CPC-Liquid-Cooling-Catalog.pdf",
+          "checked_on": "2026-10-29",
+          "rationale": "Alternative liquid-cooling connection geometry.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "quick_disconnect_4",
+          "name": "CPC Everis LQ6",
+          "unit": "mated pair",
+          "price_eur": {
+            "low": 90.0,
+            "base": 180,
+            "high": 360
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.cpcworldwide.com/Portals/0/Downloadable-Content/TRM/Literature/Catalogs/CPC-Liquid-Cooling-Catalog.pdf",
+          "checked_on": "2026-10-29",
+          "rationale": "Larger flow route for reducing coupling losses.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "quick_disconnect_5",
+          "name": "CPC Everis LQ8",
+          "unit": "mated pair",
+          "price_eur": {
+            "low": 110.0,
+            "base": 220,
+            "high": 440
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.cpcworldwide.com/Portals/0/Downloadable-Content/TRM/Literature/Catalogs/CPC-Liquid-Cooling-Catalog.pdf",
+          "checked_on": "2026-10-29",
+          "rationale": "Largest shortlisted route; increased mass and envelope.",
+          "qualification": "unverified_for_flight"
+        }
+      ]
+    },
+    {
+      "id": "tim",
+      "title": "Thermal interface / dielectric pads",
+      "unit": "m2",
+      "quantity_basis": "tim_area",
+      "notes": "Price normalised to 0.5 mm nominal sheet. Exact thickness and compression change both thermal resistance and price. Breakdown voltage is not the allowable continuous working voltage.",
+      "products": [
+        {
+          "id": "tim_1",
+          "name": "BERGQUIST GAP PAD HC3.0",
+          "unit": "m2",
+          "price_eur": {
+            "low": 100.0,
+            "base": 200,
+            "high": 400
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://dm.henkel-dam.com/is/content/henkel/lt-8305-materials-for-power-storage-systems-electric-and-hybrid-vehicle-solutions-24-pages",
+          "checked_on": "2026-10-29",
+          "rationale": "Compliant interface to accommodate cell/plate variation.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "tim_2",
+          "name": "BERGQUIST GAP PAD HC5.0",
+          "unit": "m2",
+          "price_eur": {
+            "low": 150.0,
+            "base": 300,
+            "high": 600
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://dm.henkel-dam.com/is/content/henkel/lt-8305-materials-for-power-storage-systems-electric-and-hybrid-vehicle-solutions-24-pages",
+          "checked_on": "2026-10-29",
+          "rationale": "Higher conductivity reduces interface drop at extra cost.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "tim_3",
+          "name": "BERGQUIST GAP PAD 1450",
+          "unit": "m2",
+          "price_eur": {
+            "low": 75.0,
+            "base": 150,
+            "high": 300
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://dm.henkel-dam.com/is/content/henkel/lt-8305-materials-for-power-storage-systems-electric-and-hybrid-vehicle-solutions-24-pages",
+          "checked_on": "2026-10-29",
+          "rationale": "Compliant economical interface for lower heat flux.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "tim_4",
+          "name": "BERGQUIST GAP PAD 1000HD",
+          "unit": "m2",
+          "price_eur": {
+            "low": 90.0,
+            "base": 180,
+            "high": 360
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://dm.henkel-dam.com/is/content/henkel/lt-8305-materials-for-power-storage-systems-electric-and-hybrid-vehicle-solutions-24-pages",
+          "checked_on": "2026-10-29",
+          "rationale": "Reinforced option where handling and puncture resistance matter.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "tim_5",
+          "name": "BERGQUIST GAP PAD 2200SF",
+          "unit": "m2",
+          "price_eur": {
+            "low": 120.0,
+            "base": 240,
+            "high": 480
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://dm.henkel-dam.com/is/content/henkel/lt-8305-materials-for-power-storage-systems-electric-and-hybrid-vehicle-solutions-24-pages",
+          "checked_on": "2026-10-29",
+          "rationale": "Silicone-free option if silicone contamination is a constraint.",
+          "qualification": "unverified_for_flight"
+        }
+      ]
+    },
+    {
+      "id": "contactor",
+      "title": "Main / branch / cross-tie contactors",
+      "unit": "contactor",
+      "quantity_basis": "main_contactors",
+      "notes": "Topology must determine count. Check continuous carry, make/break at actual V and L/R, fault current, coil power and bidirectionality; voltage alone is insufficient.",
+      "products": [
+        {
+          "id": "contactor_1",
+          "name": "Sensata Gigavac HX200",
+          "unit": "contactor",
+          "price_eur": {
+            "low": 175.0,
+            "base": 350,
+            "high": 700
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.sensata.com/sites/default/files/a/sensata-gigavac-contactors-selection-guide.pdf",
+          "checked_on": "2026-10-29",
+          "rationale": "HV contactor route for a compact branch.",
+          "qualification": "unverified_for_flight",
+          "max_voltage_V": 1500
+        },
+        {
+          "id": "contactor_2",
+          "name": "Sensata Gigavac HX21",
+          "unit": "contactor",
+          "price_eur": {
+            "low": 225.0,
+            "base": 450,
+            "high": 900
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.sensata.com/sites/default/files/a/sensata-gigavac-contactors-selection-guide.pdf",
+          "checked_on": "2026-10-29",
+          "rationale": "HV switching family; select exact current/coil suffix.",
+          "qualification": "unverified_for_flight",
+          "max_voltage_V": 1500
+        },
+        {
+          "id": "contactor_3",
+          "name": "Sensata Gigavac HX22",
+          "unit": "contactor",
+          "price_eur": {
+            "low": 250.0,
+            "base": 500,
+            "high": 1000
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.sensata.com/sites/default/files/a/sensata-gigavac-contactors-selection-guide.pdf",
+          "checked_on": "2026-10-29",
+          "rationale": "Alternative HV package; compare loss and interruption requirements.",
+          "qualification": "unverified_for_flight",
+          "max_voltage_V": 1500
+        },
+        {
+          "id": "contactor_4",
+          "name": "Sensata GTM400",
+          "unit": "contactor",
+          "price_eur": {
+            "low": 175.0,
+            "base": 350,
+            "high": 700
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.sensata.com/sites/default/files/a/sensata-gigavac-contactors-selection-guide.pdf",
+          "checked_on": "2026-10-29",
+          "rationale": "Bidirectional switching candidate for distribution and cross-tie.",
+          "qualification": "unverified_for_flight",
+          "max_voltage_V": 1500
+        },
+        {
+          "id": "contactor_5",
+          "name": "Sensata GTM500",
+          "unit": "contactor",
+          "price_eur": {
+            "low": 225.0,
+            "base": 450,
+            "high": 900
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.sensata.com/sites/default/files/a/sensata-gigavac-contactors-selection-guide.pdf",
+          "checked_on": "2026-10-29",
+          "rationale": "Higher-current bidirectional alternative.",
+          "qualification": "unverified_for_flight",
+          "max_voltage_V": 1500
+        }
+      ]
+    },
+    {
+      "id": "precharge_relay",
+      "title": "Precharge / discharge relay",
+      "unit": "relay",
+      "quantity_basis": "precharge_relays",
+      "notes": "Do not use a low-voltage relay merely because precharge current is low. Normally-closed PNC113 is a discharge architecture option, not a drop-in precharge substitute.",
+      "products": [
+        {
+          "id": "precharge_relay_1",
+          "name": "Sensata P105",
+          "unit": "relay",
+          "price_eur": {
+            "low": 50.0,
+            "base": 100,
+            "high": 200
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.sensata.com/sites/default/files/a/sensata-gigavac-contactors-selection-guide.pdf",
+          "checked_on": "2026-10-29",
+          "rationale": "Normally-open precharge candidate.",
+          "qualification": "unverified_for_flight",
+          "max_voltage_V": 1200
+        },
+        {
+          "id": "precharge_relay_2",
+          "name": "Sensata P115",
+          "unit": "relay",
+          "price_eur": {
+            "low": 60.0,
+            "base": 120,
+            "high": 240
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.sensata.com/sites/default/files/a/sensata-gigavac-contactors-selection-guide.pdf",
+          "checked_on": "2026-10-29",
+          "rationale": "Normally-open HV precharge candidate.",
+          "qualification": "unverified_for_flight",
+          "max_voltage_V": 1500
+        },
+        {
+          "id": "precharge_relay_3",
+          "name": "Sensata P125",
+          "unit": "relay",
+          "price_eur": {
+            "low": 50.0,
+            "base": 100,
+            "high": 200
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.sensata.com/sites/default/files/a/sensata-gigavac-contactors-selection-guide.pdf",
+          "checked_on": "2026-10-29",
+          "rationale": "PCB/threaded mounting alternative.",
+          "qualification": "unverified_for_flight",
+          "max_voltage_V": 1200
+        },
+        {
+          "id": "precharge_relay_4",
+          "name": "Sensata P195",
+          "unit": "relay",
+          "price_eur": {
+            "low": 75.0,
+            "base": 150,
+            "high": 300
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.sensata.com/sites/default/files/a/sensata-gigavac-contactors-selection-guide.pdf",
+          "checked_on": "2026-10-29",
+          "rationale": "Higher current miniature contactor route.",
+          "qualification": "unverified_for_flight",
+          "max_voltage_V": 1500
+        },
+        {
+          "id": "precharge_relay_5",
+          "name": "Sensata PNC113",
+          "unit": "relay",
+          "price_eur": {
+            "low": 65.0,
+            "base": 130,
+            "high": 260
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.sensata.com/sites/default/files/a/sensata-gigavac-contactors-selection-guide.pdf",
+          "checked_on": "2026-10-29",
+          "rationale": "Normally-closed discharge option only.",
+          "qualification": "unverified_for_flight",
+          "max_voltage_V": 1500,
+          "role": "discharge_only"
+        }
+      ]
+    },
+    {
+      "id": "resistor",
+      "title": "Precharge / discharge resistor networks",
+      "unit": "network",
+      "quantity_basis": "resistor_networks",
+      "notes": "Values are a cost allowance for a SERIES NETWORK of selected family resistors, not a single resistor across 850 V. Engineer resistance, insulation, pulse energy 0.5*C*V^2 and repetition.",
+      "products": [
+        {
+          "id": "resistor_1",
+          "name": "Vishay Dale RH025 series network",
+          "unit": "network",
+          "price_eur": {
+            "low": 22.5,
+            "base": 45,
+            "high": 90
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.vishay.com/docs/30201/rhnh.pdf",
+          "checked_on": "2026-10-29",
+          "rationale": "Small elements for distributed heat.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "resistor_2",
+          "name": "Vishay Dale RH050 series network",
+          "unit": "network",
+          "price_eur": {
+            "low": 30.0,
+            "base": 60,
+            "high": 120
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.vishay.com/docs/30201/rhnh.pdf",
+          "checked_on": "2026-10-29",
+          "rationale": "Common chassis-mounted prototype network.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "resistor_3",
+          "name": "Vishay Dale RH100 series network",
+          "unit": "network",
+          "price_eur": {
+            "low": 45.0,
+            "base": 90,
+            "high": 180
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.vishay.com/docs/30201/rhnh.pdf",
+          "checked_on": "2026-10-29",
+          "rationale": "Greater heat dissipation per element.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "resistor_4",
+          "name": "Vishay Dale RH250 series network",
+          "unit": "network",
+          "price_eur": {
+            "low": 90.0,
+            "base": 180,
+            "high": 360
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.vishay.com/docs/30201/rhnh.pdf",
+          "checked_on": "2026-10-29",
+          "rationale": "Higher thermal capacity, greater mass.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "resistor_5",
+          "name": "Vishay Dale NH050 series network",
+          "unit": "network",
+          "price_eur": {
+            "low": 32.5,
+            "base": 65,
+            "high": 130
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.vishay.com/docs/30201/rhnh.pdf",
+          "checked_on": "2026-10-29",
+          "rationale": "Non-inductive network when inductance is problematic.",
+          "qualification": "unverified_for_flight"
+        }
+      ]
+    },
+    {
+      "id": "fuse",
+      "title": "HV branch fuses",
+      "unit": "fuse",
+      "quantity_basis": "branch_fuses",
+      "notes": "Only branch protection candidates. Main-pack and auxiliary fuse lines have separate allowances. Coordinate DC breaking rating, I2t, minimum breaking current and thermal cycling.",
+      "products": [
+        {
+          "id": "fuse_1",
+          "name": "Mersen MEV100A125-4",
+          "unit": "fuse",
+          "price_eur": {
+            "low": 40.0,
+            "base": 80,
+            "high": 160
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.mersen.com/en/products/evpack-fuse-mev100a-1000-vdc-max-l-r-less-or-equal-1ms-50-300a-round-body-fuse",
+          "checked_on": "2026-10-29",
+          "rationale": "125 A nominal option; cannot substitute for required circuit-current sizing.",
+          "qualification": "unverified_for_flight",
+          "max_voltage_V": 1000,
+          "rated_current_A": 125
+        },
+        {
+          "id": "fuse_2",
+          "name": "Mersen MEV100A150-4",
+          "unit": "fuse",
+          "price_eur": {
+            "low": 42.5,
+            "base": 85,
+            "high": 170
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.mersen.com/en/products/evpack-fuse-mev100a-1000-vdc-max-l-r-less-or-equal-1ms-50-300a-round-body-fuse",
+          "checked_on": "2026-10-29",
+          "rationale": "150 A nominal option; cannot substitute for required circuit-current sizing.",
+          "qualification": "unverified_for_flight",
+          "max_voltage_V": 1000,
+          "rated_current_A": 150
+        },
+        {
+          "id": "fuse_3",
+          "name": "Mersen MEV100A200-4",
+          "unit": "fuse",
+          "price_eur": {
+            "low": 47.5,
+            "base": 95,
+            "high": 190
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.mersen.com/en/products/evpack-fuse-mev100a-1000-vdc-max-l-r-less-or-equal-1ms-50-300a-round-body-fuse",
+          "checked_on": "2026-10-29",
+          "rationale": "200 A nominal option; cannot substitute for required circuit-current sizing.",
+          "qualification": "unverified_for_flight",
+          "max_voltage_V": 1000,
+          "rated_current_A": 200
+        },
+        {
+          "id": "fuse_4",
+          "name": "Mersen MEV100A250-4",
+          "unit": "fuse",
+          "price_eur": {
+            "low": 55.0,
+            "base": 110,
+            "high": 220
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.mersen.com/en/products/evpack-fuse-mev100a-1000-vdc-max-l-r-less-or-equal-1ms-50-300a-round-body-fuse",
+          "checked_on": "2026-10-29",
+          "rationale": "250 A nominal option; cannot substitute for required circuit-current sizing.",
+          "qualification": "unverified_for_flight",
+          "max_voltage_V": 1000,
+          "rated_current_A": 250
+        },
+        {
+          "id": "fuse_5",
+          "name": "Mersen MEV100A300-4",
+          "unit": "fuse",
+          "price_eur": {
+            "low": 65.0,
+            "base": 130,
+            "high": 260
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.mersen.com/en/products/evpack-fuse-mev100a-1000-vdc-max-l-r-less-or-equal-1ms-50-300a-round-body-fuse",
+          "checked_on": "2026-10-29",
+          "rationale": "300 A nominal option; cannot substitute for required circuit-current sizing.",
+          "qualification": "unverified_for_flight",
+          "max_voltage_V": 1000,
+          "rated_current_A": 300
+        }
+      ]
+    },
+    {
+      "id": "imd",
+      "title": "Insulation monitoring devices",
+      "unit": "device",
+      "quantity_basis": "electrical_islands",
+      "notes": "Only one active measurement scheme per interconnected island unless explicitly coordinated. Industrial options are heavier prototype alternatives; qualification and system leakage capacitance require review.",
+      "products": [
+        {
+          "id": "imd_1",
+          "name": "Bender iso175",
+          "unit": "device",
+          "price_eur": {
+            "low": 325.0,
+            "base": 650,
+            "high": 1300
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.bender.de/produkte/insulation-monitoring/",
+          "checked_on": "2026-10-29",
+          "rationale": "Vehicle traction focus; preferred family to investigate.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "imd_2",
+          "name": "Bender iso685",
+          "unit": "device",
+          "price_eur": {
+            "low": 800.0,
+            "base": 1600,
+            "high": 3200
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.bender.de/produkte/insulation-monitoring/",
+          "checked_on": "2026-10-29",
+          "rationale": "Industrial comparison for lab integration; mass penalty.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "imd_3",
+          "name": "Bender iso685-B",
+          "unit": "device",
+          "price_eur": {
+            "low": 950.0,
+            "base": 1900,
+            "high": 3800
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.bender.de/produkte/insulation-monitoring/",
+          "checked_on": "2026-10-29",
+          "rationale": "Coupled-network variant; investigate bus cross-tie coordination.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "imd_4",
+          "name": "Bender isoHV425 + AGH422",
+          "unit": "device",
+          "price_eur": {
+            "low": 600.0,
+            "base": 1200,
+            "high": 2400
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.bender.de/produkte/insulation-monitoring/",
+          "checked_on": "2026-10-29",
+          "rationale": "Coupled HV monitoring assembly; include both devices.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "imd_5",
+          "name": "Bender IR155-4204",
+          "unit": "device",
+          "price_eur": {
+            "low": 225.0,
+            "base": 450,
+            "high": 900
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.bender.de/produkte/insulation-monitoring/",
+          "checked_on": "2026-10-29",
+          "rationale": "Compact traction-monitoring route; verify voltage and interface revision.",
+          "qualification": "unverified_for_flight"
+        }
+      ]
+    },
+    {
+      "id": "hv_connector",
+      "title": "HV power connectors",
+      "unit": "mated single-pole pair",
+      "quantity_basis": "hv_connector_pairs",
+      "notes": "Select exact 1000/1500 V variant. One pair is one pole, not a complete positive/negative cable. Shield/HVIL are not present on every variant.",
+      "products": [
+        {
+          "id": "hv_connector_1",
+          "name": "Amphenol SurLok Plus 8.0 mm EMI",
+          "unit": "mated single-pole pair",
+          "price_eur": {
+            "low": 45.0,
+            "base": 90,
+            "high": 180
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://amphenol-industrial.com/products/surlok-plus/",
+          "checked_on": "2026-10-29",
+          "rationale": "Shielded route for smaller branches; verify ampacity.",
+          "qualification": "unverified_for_flight",
+          "max_voltage_V": 1000
+        },
+        {
+          "id": "hv_connector_2",
+          "name": "Amphenol SurLok Plus 10.3 mm",
+          "unit": "mated single-pole pair",
+          "price_eur": {
+            "low": 50.0,
+            "base": 100,
+            "high": 200
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://amphenol-industrial.com/products/surlok-plus/",
+          "checked_on": "2026-10-29",
+          "rationale": "Intermediate current/size tradeoff.",
+          "qualification": "unverified_for_flight",
+          "max_voltage_V": 1000
+        },
+        {
+          "id": "hv_connector_3",
+          "name": "Amphenol SurLok Plus 12.0 mm",
+          "unit": "mated single-pole pair",
+          "price_eur": {
+            "low": 65.0,
+            "base": 130,
+            "high": 260
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://amphenol-industrial.com/products/surlok-plus/",
+          "checked_on": "2026-10-29",
+          "rationale": "Larger current connection; external HVIL may be needed.",
+          "qualification": "unverified_for_flight",
+          "max_voltage_V": 1000
+        },
+        {
+          "id": "hv_connector_4",
+          "name": "Amphenol SurLok Plus 14.0 mm EMI",
+          "unit": "mated single-pole pair",
+          "price_eur": {
+            "low": 80.0,
+            "base": 160,
+            "high": 320
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://amphenol-industrial.com/products/surlok-plus/",
+          "checked_on": "2026-10-29",
+          "rationale": "High-current shielded option; larger envelope.",
+          "qualification": "unverified_for_flight",
+          "max_voltage_V": 1000
+        },
+        {
+          "id": "hv_connector_5",
+          "name": "Amphenol SurLok Plus 8.0 mm non-EMI",
+          "unit": "mated single-pole pair",
+          "price_eur": {
+            "low": 32.5,
+            "base": 65,
+            "high": 130
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://amphenol-industrial.com/products/surlok-plus/",
+          "checked_on": "2026-10-29",
+          "rationale": "Unshielded option for appropriate internal DC connections only.",
+          "qualification": "unverified_for_flight",
+          "max_voltage_V": 1000
+        }
+      ]
+    },
+    {
+      "id": "hv_cable",
+      "title": "HV cable assemblies",
+      "unit": "m conductor allowance",
+      "quantity_basis": "hv_cable_m",
+      "notes": "EV-C2 is a terminated connection system. Price here is AUTHOR per-metre budgeting, excluding connector line to prevent double count; request a BOM split. Sum DC plus/minus and all three AC phases. 35mm2 is 850 V, larger variants 1000 V.",
+      "products": [
+        {
+          "id": "hv_cable_1",
+          "name": "HUBER+SUHNER RADOX EV-C2 35 mm2 assembly cable portion",
+          "unit": "m conductor allowance",
+          "price_eur": {
+            "low": 10.0,
+            "base": 20,
+            "high": 40
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.hubersuhner.com/en/shop/product/cable-assemblies-systems/electric-vehicles/85257333/radox-ev-c-2-single-core-gl1",
+          "checked_on": "2026-10-29",
+          "rationale": "Screened EV cable route; select gauge from current, losses and mass, not price.",
+          "qualification": "unverified_for_flight",
+          "max_voltage_V": 850
+        },
+        {
+          "id": "hv_cable_2",
+          "name": "HUBER+SUHNER RADOX EV-C2 50 mm2 assembly cable portion",
+          "unit": "m conductor allowance",
+          "price_eur": {
+            "low": 13.5,
+            "base": 27,
+            "high": 54
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.hubersuhner.com/en/shop/product/cable-assemblies-systems/electric-vehicles/85257333/radox-ev-c-2-single-core-gl1",
+          "checked_on": "2026-10-29",
+          "rationale": "Screened EV cable route; select gauge from current, losses and mass, not price.",
+          "qualification": "unverified_for_flight",
+          "max_voltage_V": 1000
+        },
+        {
+          "id": "hv_cable_3",
+          "name": "HUBER+SUHNER RADOX EV-C2 70 mm2 assembly cable portion",
+          "unit": "m conductor allowance",
+          "price_eur": {
+            "low": 17.5,
+            "base": 35,
+            "high": 70
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.hubersuhner.com/en/shop/product/cable-assemblies-systems/electric-vehicles/85257333/radox-ev-c-2-single-core-gl1",
+          "checked_on": "2026-10-29",
+          "rationale": "Screened EV cable route; select gauge from current, losses and mass, not price.",
+          "qualification": "unverified_for_flight",
+          "max_voltage_V": 1000
+        },
+        {
+          "id": "hv_cable_4",
+          "name": "HUBER+SUHNER RADOX EV-C2 95 mm2 assembly cable portion",
+          "unit": "m conductor allowance",
+          "price_eur": {
+            "low": 22.5,
+            "base": 45,
+            "high": 90
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.hubersuhner.com/en/shop/product/cable-assemblies-systems/electric-vehicles/85257333/radox-ev-c-2-single-core-gl1",
+          "checked_on": "2026-10-29",
+          "rationale": "Screened EV cable route; select gauge from current, losses and mass, not price.",
+          "qualification": "unverified_for_flight",
+          "max_voltage_V": 1000
+        },
+        {
+          "id": "hv_cable_5",
+          "name": "HUBER+SUHNER RADOX EV-C2 120 mm2 assembly cable portion",
+          "unit": "m conductor allowance",
+          "price_eur": {
+            "low": 27.5,
+            "base": 55,
+            "high": 110
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.hubersuhner.com/en/shop/product/cable-assemblies-systems/electric-vehicles/85257333/radox-ev-c-2-single-core-gl1",
+          "checked_on": "2026-10-29",
+          "rationale": "Screened EV cable route; select gauge from current, losses and mass, not price.",
+          "qualification": "unverified_for_flight",
+          "max_voltage_V": 1000
+        }
+      ]
+    },
+    {
+      "id": "current_sensor",
+      "title": "Independent pack current sensors",
+      "unit": "sensor",
+      "quantity_basis": "current_sensors",
+      "notes": "Check isolation/creepage at bus voltage, external conductor aperture, offset and BMS input. Not needed twice if supplied in a BJU.",
+      "products": [
+        {
+          "id": "current_sensor_1",
+          "name": "LEM HASS 200-S",
+          "unit": "sensor",
+          "price_eur": {
+            "low": 25.0,
+            "base": 50,
+            "high": 100
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.lem.com/en/hass",
+          "checked_on": "2026-10-29",
+          "rationale": "200 A nominal range; choose headroom versus resolution for pack current.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "current_sensor_2",
+          "name": "LEM HASS 300-S",
+          "unit": "sensor",
+          "price_eur": {
+            "low": 27.5,
+            "base": 55,
+            "high": 110
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.lem.com/en/hass",
+          "checked_on": "2026-10-29",
+          "rationale": "300 A nominal range; choose headroom versus resolution for pack current.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "current_sensor_3",
+          "name": "LEM HASS 400-S",
+          "unit": "sensor",
+          "price_eur": {
+            "low": 30.0,
+            "base": 60,
+            "high": 120
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.lem.com/en/hass",
+          "checked_on": "2026-10-29",
+          "rationale": "400 A nominal range; choose headroom versus resolution for pack current.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "current_sensor_4",
+          "name": "LEM HASS 500-S",
+          "unit": "sensor",
+          "price_eur": {
+            "low": 32.5,
+            "base": 65,
+            "high": 130
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.lem.com/en/hass",
+          "checked_on": "2026-10-29",
+          "rationale": "500 A nominal range; choose headroom versus resolution for pack current.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "current_sensor_5",
+          "name": "LEM HASS 600-S",
+          "unit": "sensor",
+          "price_eur": {
+            "low": 35.0,
+            "base": 70,
+            "high": 140
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.lem.com/en/hass",
+          "checked_on": "2026-10-29",
+          "rationale": "600 A nominal range; choose headroom versus resolution for pack current.",
+          "qualification": "unverified_for_flight"
+        }
+      ]
+    },
+    {
+      "id": "voltage_sensor",
+      "title": "Independent HV bus voltage sensing",
+      "unit": "sensor",
+      "quantity_basis": "voltage_sensors",
+      "notes": "Redundant bus/precharge sensing; remove if included in BJU and no independent channel required. Family variant insulation and measurement range need confirmation.",
+      "products": [
+        {
+          "id": "voltage_sensor_1",
+          "name": "LEM DVL 1000",
+          "unit": "sensor",
+          "price_eur": {
+            "low": 100.0,
+            "base": 200,
+            "high": 400
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.lem.com/en/dvl",
+          "checked_on": "2026-10-29",
+          "rationale": "Measurement range centred on an approximately 850 V bus.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "voltage_sensor_2",
+          "name": "LEM DVL 1500",
+          "unit": "sensor",
+          "price_eur": {
+            "low": 120.0,
+            "base": 240,
+            "high": 480
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.lem.com/en/dvl",
+          "checked_on": "2026-10-29",
+          "rationale": "Additional measuring headroom with reduced relative resolution.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "voltage_sensor_3",
+          "name": "LEM DVL 2000",
+          "unit": "sensor",
+          "price_eur": {
+            "low": 140.0,
+            "base": 280,
+            "high": 560
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.lem.com/en/dvl",
+          "checked_on": "2026-10-29",
+          "rationale": "Higher-range alternative for test infrastructure.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "voltage_sensor_4",
+          "name": "LEM DVL 1000-UI",
+          "unit": "sensor",
+          "price_eur": {
+            "low": 115.0,
+            "base": 230,
+            "high": 460
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.lem.com/en/dvl",
+          "checked_on": "2026-10-29",
+          "rationale": "4\u201320 mA interface option; requires correct receiver.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "voltage_sensor_5",
+          "name": "LEM DVL 1500-UI",
+          "unit": "sensor",
+          "price_eur": {
+            "low": 130.0,
+            "base": 260,
+            "high": 520
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.lem.com/en/dvl",
+          "checked_on": "2026-10-29",
+          "rationale": "Higher-range current-loop output option.",
+          "qualification": "unverified_for_flight"
+        }
+      ]
+    },
+    {
+      "id": "temperature",
+      "title": "Coolant / structure temperature probes",
+      "unit": "probe",
+      "quantity_basis": "temperature_probes",
+      "notes": "RTD coolant probes are separate from battery NTC harness allowance. Choose signal conditioning, thread and immersion length.",
+      "products": [
+        {
+          "id": "temperature_1",
+          "name": "OMEGA PR-21",
+          "unit": "probe",
+          "price_eur": {
+            "low": 40.0,
+            "base": 80,
+            "high": 160
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.omegaengineering.cn/subsection_eng/general-purpose-rtd-probes.html",
+          "checked_on": "2026-10-29",
+          "rationale": "Vibration-resistant threaded coolant probe.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "temperature_2",
+          "name": "OMEGA PR-26",
+          "unit": "probe",
+          "price_eur": {
+            "low": 50.0,
+            "base": 100,
+            "high": 200
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.omegaengineering.cn/subsection_eng/general-purpose-rtd-probes.html",
+          "checked_on": "2026-10-29",
+          "rationale": "Vibration-tested bendable probe for constrained routing.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "temperature_3",
+          "name": "OMEGA PR-31",
+          "unit": "probe",
+          "price_eur": {
+            "low": 60.0,
+            "base": 120,
+            "high": 240
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.omegaengineering.cn/subsection_eng/general-purpose-rtd-probes.html",
+          "checked_on": "2026-10-29",
+          "rationale": "Higher-temperature connector option near propulsion electronics.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "temperature_4",
+          "name": "OMEGA PR-22",
+          "unit": "probe",
+          "price_eur": {
+            "low": 37.5,
+            "base": 75,
+            "high": 150
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.omegaengineering.cn/subsection_eng/general-purpose-rtd-probes.html",
+          "checked_on": "2026-10-29",
+          "rationale": "M12 connector option for removable harnesses.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "temperature_5",
+          "name": "OMEGA PR-23",
+          "unit": "probe",
+          "price_eur": {
+            "low": 37.5,
+            "base": 75,
+            "high": 150
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.omegaengineering.cn/subsection_eng/general-purpose-rtd-probes.html",
+          "checked_on": "2026-10-29",
+          "rationale": "M8 connector option for smaller packaging.",
+          "qualification": "unverified_for_flight"
+        }
+      ]
+    },
+    {
+      "id": "pressure",
+      "title": "Coolant pressure sensors",
+      "unit": "sensor",
+      "quantity_basis": "pressure_sensors",
+      "notes": "Select low-range variant spanning normal pressure and faults; no assumption that a generic 700 bar part has useful resolution for this loop.",
+      "products": [
+        {
+          "id": "pressure_1",
+          "name": "TE M3200",
+          "unit": "sensor",
+          "price_eur": {
+            "low": 50.0,
+            "base": 100,
+            "high": 200
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.te.com.cn/content/dam/te-com/documents/sensors/global/te-sensor-solutions-catalog-pressure-sensors.pdf",
+          "checked_on": "2026-10-29",
+          "rationale": "Analogue/digital configuration options for loop monitoring.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "pressure_2",
+          "name": "TE M5600",
+          "unit": "sensor",
+          "price_eur": {
+            "low": 70.0,
+            "base": 140,
+            "high": 280
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.te.com.cn/content/dam/te-com/documents/sensors/global/te-sensor-solutions-catalog-pressure-sensors.pdf",
+          "checked_on": "2026-10-29",
+          "rationale": "Digital pressure/temperature sensing route.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "pressure_3",
+          "name": "TE U5600",
+          "unit": "sensor",
+          "price_eur": {
+            "low": 75.0,
+            "base": 150,
+            "high": 300
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.te.com.cn/content/dam/te-com/documents/sensors/global/te-sensor-solutions-catalog-pressure-sensors.pdf",
+          "checked_on": "2026-10-29",
+          "rationale": "Lower-pressure variant family to investigate.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "pressure_4",
+          "name": "TE MSP300",
+          "unit": "sensor",
+          "price_eur": {
+            "low": 45.0,
+            "base": 90,
+            "high": 180
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.te.com.cn/content/dam/te-com/documents/sensors/global/te-sensor-solutions-catalog-pressure-sensors.pdf",
+          "checked_on": "2026-10-29",
+          "rationale": "Compact isolated transducer route.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "pressure_5",
+          "name": "TE MSP340",
+          "unit": "sensor",
+          "price_eur": {
+            "low": 50.0,
+            "base": 100,
+            "high": 200
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.te.com.cn/content/dam/te-com/documents/sensors/global/te-sensor-solutions-catalog-pressure-sensors.pdf",
+          "checked_on": "2026-10-29",
+          "rationale": "Alternative microfused pressure transducer family.",
+          "qualification": "unverified_for_flight"
+        }
+      ]
+    },
+    {
+      "id": "flow",
+      "title": "Flow meters (prototype instrumentation)",
+      "unit": "meter",
+      "quantity_basis": "flow_meters",
+      "notes": "Optional onboard; valuable in development. Industrial mass can be excessive. Conductivity, glycol calibration, 70C medium limit in referenced guide and flow range must be checked.",
+      "products": [
+        {
+          "id": "flow_1",
+          "name": "ifm SM6000",
+          "unit": "meter",
+          "price_eur": {
+            "low": 175.0,
+            "base": 350,
+            "high": 700
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.ifm.com/ifmweb/downcont.nsf/files/ifm-the-right-choice-flow-sensors-flow-meters-from-ifm-dk/%24file/ifm-the-right-choice-flow-sensors-flow-meters-from-ifm-dk.pdf",
+          "checked_on": "2026-10-29",
+          "rationale": "0.1\u201325 L/min range for smaller loops.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "flow_2",
+          "name": "ifm SM7000",
+          "unit": "meter",
+          "price_eur": {
+            "low": 210.0,
+            "base": 420,
+            "high": 840
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.ifm.com/ifmweb/downcont.nsf/files/ifm-the-right-choice-flow-sensors-flow-meters-from-ifm-dk/%24file/ifm-the-right-choice-flow-sensors-flow-meters-from-ifm-dk.pdf",
+          "checked_on": "2026-10-29",
+          "rationale": "0.2\u201350 L/min range for intermediate loops.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "flow_3",
+          "name": "ifm SM8000",
+          "unit": "meter",
+          "price_eur": {
+            "low": 250.0,
+            "base": 500,
+            "high": 1000
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.ifm.com/ifmweb/downcont.nsf/files/ifm-the-right-choice-flow-sensors-flow-meters-from-ifm-dk/%24file/ifm-the-right-choice-flow-sensors-flow-meters-from-ifm-dk.pdf",
+          "checked_on": "2026-10-29",
+          "rationale": "0.2\u2013100 L/min range for larger loops.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "flow_4",
+          "name": "ifm SM6100",
+          "unit": "meter",
+          "price_eur": {
+            "low": 180.0,
+            "base": 360,
+            "high": 720
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.ifm.com/ifmweb/downcont.nsf/files/ifm-the-right-choice-flow-sensors-flow-meters-from-ifm-dk/%24file/ifm-the-right-choice-flow-sensors-flow-meters-from-ifm-dk.pdf",
+          "checked_on": "2026-10-29",
+          "rationale": "EPDM seal option in the smaller flow range.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "flow_5",
+          "name": "ifm SM7100",
+          "unit": "meter",
+          "price_eur": {
+            "low": 215.0,
+            "base": 430,
+            "high": 860
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.ifm.com/ifmweb/downcont.nsf/files/ifm-the-right-choice-flow-sensors-flow-meters-from-ifm-dk/%24file/ifm-the-right-choice-flow-sensors-flow-meters-from-ifm-dk.pdf",
+          "checked_on": "2026-10-29",
+          "rationale": "EPDM seal option in the intermediate flow range.",
+          "qualification": "unverified_for_flight"
+        }
+      ]
+    },
+    {
+      "id": "dc_dc",
+      "title": "HV-to-LV auxiliary converters",
+      "unit": "converter",
+      "quantity_basis": "dc_dc_units",
+      "notes": "Cost installed redundant units; size from simultaneous pumps, fans, BMS and controllers including loss. These do not regulate the propulsion DC bus.",
+      "products": [
+        {
+          "id": "dc_dc_1",
+          "name": "BrightLoop DCDC SP",
+          "unit": "converter",
+          "price_eur": {
+            "low": 1100.0,
+            "base": 2200,
+            "high": 4400
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://brightloop.fr/support/downloads/",
+          "checked_on": "2026-10-29",
+          "rationale": "1.9 kW family; verify minimum input, output voltage, cooling and startup current.",
+          "qualification": "unverified_for_flight",
+          "max_voltage_V": 950
+        },
+        {
+          "id": "dc_dc_2",
+          "name": "BrightLoop DCDC MP",
+          "unit": "converter",
+          "price_eur": {
+            "low": 1750.0,
+            "base": 3500,
+            "high": 7000
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://brightloop.fr/support/downloads/",
+          "checked_on": "2026-10-29",
+          "rationale": "4.8 kW family; verify minimum input, output voltage, cooling and startup current.",
+          "qualification": "unverified_for_flight",
+          "max_voltage_V": 950
+        },
+        {
+          "id": "dc_dc_3",
+          "name": "BrightLoop DCDC LP",
+          "unit": "converter",
+          "price_eur": {
+            "low": 2750.0,
+            "base": 5500,
+            "high": 11000
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://brightloop.fr/support/downloads/",
+          "checked_on": "2026-10-29",
+          "rationale": "9.6 kW family; verify minimum input, output voltage, cooling and startup current.",
+          "qualification": "unverified_for_flight",
+          "max_voltage_V": 950
+        },
+        {
+          "id": "dc_dc_4",
+          "name": "BrightLoop DCDC MO",
+          "unit": "converter",
+          "price_eur": {
+            "low": 2100.0,
+            "base": 4200,
+            "high": 8400
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://brightloop.fr/support/downloads/",
+          "checked_on": "2026-10-29",
+          "rationale": "6 kW family; verify minimum input, output voltage, cooling and startup current.",
+          "qualification": "unverified_for_flight",
+          "max_voltage_V": 1000
+        },
+        {
+          "id": "dc_dc_5",
+          "name": "BrightLoop DCDC LO",
+          "unit": "converter",
+          "price_eur": {
+            "low": 3250.0,
+            "base": 6500,
+            "high": 13000
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://brightloop.fr/support/downloads/",
+          "checked_on": "2026-10-29",
+          "rationale": "12 kW family; verify minimum input, output voltage, cooling and startup current.",
+          "qualification": "unverified_for_flight",
+          "max_voltage_V": 1000
+        }
+      ]
+    },
+    {
+      "id": "coolant",
+      "title": "Inhibited propylene-glycol coolant",
+      "unit": "L final mixture",
+      "quantity_basis": "coolant_L",
+      "notes": "Budget includes concentrate dilution water. Recompute density/cp/viscosity for selected mix and temperature; 30% may not meet the coldest storage requirement. Never mix inhibitor packages.",
+      "products": [
+        {
+          "id": "coolant_1",
+          "name": "Dow DOWFROST / water mix",
+          "unit": "L final mixture",
+          "price_eur": {
+            "low": 2.5,
+            "base": 5,
+            "high": 10
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.dow.com/en-us/brand/dowfrost.html",
+          "checked_on": "2026-10-29",
+          "rationale": "PG coolant candidate with engineering property data.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "coolant_2",
+          "name": "Dow DOWFROST HD / water mix",
+          "unit": "L final mixture",
+          "price_eur": {
+            "low": 3.0,
+            "base": 6,
+            "high": 12
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.dow.com/documents/180/180-01315-01-dowfrost-hd-tds.pdf?iframe=true",
+          "checked_on": "2026-10-29",
+          "rationale": "Inhibited PG formulation; verify all wetted metals.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "coolant_3",
+          "name": "TYFOCOR L / water mix",
+          "unit": "L final mixture",
+          "price_eur": {
+            "low": 2.5,
+            "base": 5,
+            "high": 10
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://tyfo.de/en/product-overview/",
+          "checked_on": "2026-10-29",
+          "rationale": "European PG concentrate option; concentration controls frost protection.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "coolant_4",
+          "name": "TYFOCOR L-eco / water mix",
+          "unit": "L final mixture",
+          "price_eur": {
+            "low": 3.0,
+            "base": 6,
+            "high": 12
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://tyfo.de/en/product-overview/",
+          "checked_on": "2026-10-29",
+          "rationale": "Alternative cooling/heating formulation; compare property curves.",
+          "qualification": "unverified_for_flight"
+        },
+        {
+          "id": "coolant_5",
+          "name": "Glysofor L / water mix",
+          "unit": "L final mixture",
+          "price_eur": {
+            "low": 2.0,
+            "base": 4,
+            "high": 8
+          },
+          "price_status": "engineering_allowance_NOT_vendor_price",
+          "price_source": null,
+          "price_basis": "Author-entered preliminary procurement allowance, EUR ex VAT; no supplier quote. Range is 0.5\u20132x base, not statistical confidence.",
+          "technical_source": "https://www.glysofor.de/en/glysofor-l/",
+          "checked_on": "2026-10-29",
+          "rationale": "PG coolant with published concentration/freeze relationship.",
+          "qualification": "unverified_for_flight"
+        }
+      ]
+    }
+  ],
+  "allowances": [
+    {
+      "id": "cell_interconnect",
+      "title": "Cell tabs, fusible links, welds and series interconnects",
+      "quantity_basis": "cells",
+      "unit_price_eur": {
+        "low": 0.3,
+        "base": 0.6,
+        "high": 1.2
+      },
+      "notes": "Exclude main distribution busbars; manufacturing labour separate.",
+      "price_status": "unresearched_engineering_allowance",
+      "five_products_available": false
+    },
+    {
+      "id": "holders",
+      "title": "Cell holders, spacers and cell insulation rings",
+      "quantity_basis": "cells",
+      "unit_price_eur": {
+        "low": 0.175,
+        "base": 0.35,
+        "high": 0.7
+      },
+      "notes": "Material, spacing, retention and tolerances require drawings.",
+      "price_status": "unresearched_engineering_allowance",
+      "five_products_available": false
+    },
+    {
+      "id": "sense_harness",
+      "title": "Cell voltage leads, tap protection, NTCs, connectors and BMS harness",
+      "quantity_basis": "series",
+      "unit_price_eur": {
+        "low": 1.5,
+        "base": 3,
+        "high": 6
+      },
+      "notes": "NTC density requires thermal review; separate coolant RTDs are not included.",
+      "price_status": "unresearched_engineering_allowance",
+      "five_products_available": false
+    },
+    {
+      "id": "pack_enclosure",
+      "title": "Pack section enclosure, lid, seals and retention",
+      "quantity_basis": "battery_sections",
+      "unit_price_eur": {
+        "low": 375.0,
+        "base": 750,
+        "high": 1500
+      },
+      "notes": "Custom wing-specific structure; crash/vent design not established.",
+      "price_status": "unresearched_engineering_allowance",
+      "five_products_available": false
+    },
+    {
+      "id": "fire_barriers",
+      "title": "Cell/module fire and propagation barriers",
+      "quantity_basis": "battery_sections",
+      "unit_price_eur": {
+        "low": 250.0,
+        "base": 500,
+        "high": 1000
+      },
+      "notes": "Material and thickness selected after propagation testing.",
+      "price_status": "unresearched_engineering_allowance",
+      "five_products_available": false
+    },
+    {
+      "id": "venting",
+      "title": "Pack emergency vent, duct, drainage and normal pressure equalisation",
+      "quantity_basis": "battery_sections",
+      "unit_price_eur": {
+        "low": 200.0,
+        "base": 400,
+        "high": 800
+      },
+      "notes": "Both normal breathing and runaway discharge paths must be engineered.",
+      "price_status": "unresearched_engineering_allowance",
+      "five_products_available": false
+    },
+    {
+      "id": "busbars",
+      "title": "HV distribution busbars, insulation and junction enclosure",
+      "quantity_basis": "electrical_islands",
+      "unit_price_eur": {
+        "low": 350.0,
+        "base": 700,
+        "high": 1400
+      },
+      "notes": "Separate from cell interconnects.",
+      "price_status": "unresearched_engineering_allowance",
+      "five_products_available": false
+    },
+    {
+      "id": "main_fuses",
+      "title": "Pack main fuse and insulated mount",
+      "quantity_basis": "electrical_islands",
+      "unit_price_eur": {
+        "low": 110.0,
+        "base": 220,
+        "high": 440
+      },
+      "notes": "Voltage/current and fault interruption not yet specified.",
+      "price_status": "unresearched_engineering_allowance",
+      "five_products_available": false
+    },
+    {
+      "id": "aux_fuses",
+      "title": "HV/LV auxiliary fuses, fuse holders and protected distribution",
+      "quantity_basis": "electrical_islands",
+      "unit_price_eur": {
+        "low": 90.0,
+        "base": 180,
+        "high": 360
+      },
+      "notes": "Includes DC/DC branch protection; excludes propulsion branch fuses.",
+      "price_status": "unresearched_engineering_allowance",
+      "five_products_available": false
+    },
+    {
+      "id": "service_disconnect",
+      "title": "1000V-class service disconnect and HVIL",
+      "quantity_basis": "electrical_islands",
+      "unit_price_eur": {
+        "low": 150.0,
+        "base": 300,
+        "high": 600
+      },
+      "notes": "Exact SKU unresolved; TE shunt 1000V variant exists, 450V fused variant is unsuitable.",
+      "price_status": "unresearched_engineering_allowance",
+      "five_products_available": false
+    },
+    {
+      "id": "reservoir",
+      "title": "Expansion/degas reservoir, cap, fill and drain hardware",
+      "quantity_basis": "loops",
+      "unit_price_eur": {
+        "low": 90.0,
+        "base": 180,
+        "high": 360
+      },
+      "notes": "Pressure and attitude/slosh behaviour need definition.",
+      "price_status": "unresearched_engineering_allowance",
+      "five_products_available": false
+    },
+    {
+      "id": "fittings",
+      "title": "Fixed fittings, elbows, tees, clamps and seals",
+      "quantity_basis": "loops",
+      "unit_price_eur": {
+        "low": 90.0,
+        "base": 180,
+        "high": 360
+      },
+      "notes": "Excludes separately counted dry-break pairs.",
+      "price_status": "unresearched_engineering_allowance",
+      "five_products_available": false
+    },
+    {
+      "id": "manifold",
+      "title": "Battery flow distribution manifold pair",
+      "quantity_basis": "battery_sections",
+      "unit_price_eur": {
+        "low": 125.0,
+        "base": 250,
+        "high": 500
+      },
+      "notes": "Remove if included in quoted cold-plate assembly.",
+      "price_status": "unresearched_engineering_allowance",
+      "five_products_available": false
+    },
+    {
+      "id": "filter_valves",
+      "title": "Strainer, bypass/check/isolation valves as required",
+      "quantity_basis": "loops",
+      "unit_price_eur": {
+        "low": 75.0,
+        "base": 150,
+        "high": 300
+      },
+      "notes": "Optional devices can increase pressure drop; exact architecture unresolved.",
+      "price_status": "unresearched_engineering_allowance",
+      "five_products_available": false
+    },
+    {
+      "id": "duct_shroud",
+      "title": "Radiator inlet/outlet duct, fan shroud and sealing",
+      "quantity_basis": "loops",
+      "unit_price_eur": {
+        "low": 200.0,
+        "base": 400,
+        "high": 800
+      },
+      "notes": "Custom nacelle geometry; no validated stock alternatives.",
+      "price_status": "unresearched_engineering_allowance",
+      "five_products_available": false
+    },
+    {
+      "id": "lv_harness",
+      "title": "LV power, shielded data wiring, terminals, backshells and sleeving",
+      "quantity_basis": "aircraft",
+      "unit_price_eur": {
+        "low": 600.0,
+        "base": 1200,
+        "high": 2400
+      },
+      "notes": "CAN/fibre topology unresolved; include HVIL wiring.",
+      "price_status": "unresearched_engineering_allowance",
+      "five_products_available": false
+    },
+    {
+      "id": "control",
+      "title": "Powertrain supervisory controller, IO, drivers and communication interface",
+      "quantity_basis": "electrical_islands",
+      "unit_price_eur": {
+        "low": 400.0,
+        "base": 800,
+        "high": 1600
+      },
+      "notes": "Not the flight control computer. BMS/inverter firmware integration needed.",
+      "price_status": "unresearched_engineering_allowance",
+      "five_products_available": false
+    },
+    {
+      "id": "lv_backup",
+      "title": "Auxiliary backup battery, charging/protection and isolation",
+      "quantity_basis": "aircraft",
+      "unit_price_eur": {
+        "low": 300.0,
+        "base": 600,
+        "high": 1200
+      },
+      "notes": "Size for safe shutdown/landing duty, separate from traction pack.",
+      "price_status": "unresearched_engineering_allowance",
+      "five_products_available": false
+    },
+    {
+      "id": "mounts",
+      "title": "Equipment brackets, fasteners, bonding straps and vibration mounts",
+      "quantity_basis": "aircraft",
+      "unit_price_eur": {
+        "low": 750.0,
+        "base": 1500,
+        "high": 3000
+      },
+      "notes": "Motor mounting hardware included, motors themselves excluded.",
+      "price_status": "unresearched_engineering_allowance",
+      "five_products_available": false
+    },
+    {
+      "id": "charge_port",
+      "title": "Charge inlet, protective cap, HVIL and charge-control interface",
+      "quantity_basis": "aircraft",
+      "unit_price_eur": {
+        "low": 300.0,
+        "base": 600,
+        "high": 1200
+      },
+      "notes": "External charger budget is ground equipment below.",
+      "price_status": "unresearched_engineering_allowance",
+      "five_products_available": false
+    },
+    {
+      "id": "ground_charger",
+      "title": "External HV charger and charge harness",
+      "quantity_basis": "ground",
+      "unit_price_eur": {
+        "low": 3000.0,
+        "base": 6000,
+        "high": 12000
+      },
+      "notes": "Not airborne mass; specify pack charge window, current and grid supply.",
+      "price_status": "unresearched_engineering_allowance",
+      "five_products_available": false
+    },
+    {
+      "id": "assembly",
+      "title": "Electrical/thermal assembly labour",
+      "quantity_basis": "labour_hours",
+      "unit_price_eur": {
+        "low": 32.5,
+        "base": 65,
+        "high": 130
+      },
+      "notes": "EUR/hour author assumption; no supplier rate.",
+      "price_status": "unresearched_engineering_allowance",
+      "five_products_available": false
+    },
+    {
+      "id": "nre",
+      "title": "Custom drawings, tooling and integration development",
+      "quantity_basis": "project",
+      "unit_price_eur": {
+        "low": 7500.0,
+        "base": 15000,
+        "high": 30000
+      },
+      "notes": "One-time allowance; excludes formal aircraft certification programme.",
+      "price_status": "unresearched_engineering_allowance",
+      "five_products_available": false
+    },
+    {
+      "id": "rotor_hub",
+      "title": "Propeller/rotor blades and hub assembly",
+      "quantity_basis": "rotors",
+      "unit_price_eur": {
+        "low": 2500.0,
+        "base": 5000,
+        "high": 10000
+      },
+      "notes": "Custom 1.47m inner / 1.06m outer designs require aerodynamic and overspeed validation; no matched retail product identified.",
+      "price_status": "unresearched_engineering_allowance",
+      "five_products_available": false
+    },
+    {
+      "id": "shaft_hardware",
+      "title": "External shaft coupling, bearings and retention if required",
+      "quantity_basis": "shaft_assemblies",
+      "unit_price_eur": {
+        "low": 400.0,
+        "base": 800,
+        "high": 1600
+      },
+      "notes": "Zero when completely supplied with motor/rotor assembly.",
+      "price_status": "unresearched_engineering_allowance",
+      "five_products_available": false
+    },
+    {
+      "id": "gearbox",
+      "title": "Reduction/speed-changing gearbox if required",
+      "quantity_basis": "gearboxes",
+      "unit_price_eur": {
+        "low": 2500.0,
+        "base": 5000,
+        "high": 10000
+      },
+      "notes": "Direct drive default: zero. Ratio, torque, speed and flight life unresolved.",
+      "price_status": "unresearched_engineering_allowance",
+      "five_products_available": false
+    },
+    {
+      "id": "tilt_actuation",
+      "title": "Wing/rotor tilt actuator, gearbox, position sensing and locks",
+      "quantity_basis": "tilt_actuators",
+      "unit_price_eur": {
+        "low": 1750.0,
+        "base": 3500,
+        "high": 7000
+      },
+      "notes": "Airframe-owned interface; zero until actual architecture defines count.",
+      "price_status": "unresearched_engineering_allowance",
+      "five_products_available": false
+    },
+    {
+      "id": "flight_computer",
+      "title": "FCC hardware and voter allowance",
+      "quantity_basis": "flight_computers",
+      "unit_price_eur": {
+        "low": 1250.0,
+        "base": 2500,
+        "high": 5000
+      },
+      "notes": "Outside electrical powertrain by default; not flight-control software or avionics suite.",
+      "price_status": "unresearched_engineering_allowance",
+      "five_products_available": false
+    },
+    {
+      "id": "emi_filter",
+      "title": "Additional HV EMI filtering outside supplied inverter",
+      "quantity_basis": "external_filters",
+      "unit_price_eur": {
+        "low": 250.0,
+        "base": 500,
+        "high": 1000
+      },
+      "notes": "Zero by default; coordinate filter capacitance with insulation monitoring.",
+      "price_status": "unresearched_engineering_allowance",
+      "five_products_available": false
+    },
+    {
+      "id": "dc_link",
+      "title": "Additional DC link capacitors/busbar assembly",
+      "quantity_basis": "external_dc_links",
+      "unit_price_eur": {
+        "low": 250.0,
+        "base": 500,
+        "high": 1000
+      },
+      "notes": "Zero when included in inverter. Do not double count.",
+      "price_status": "unresearched_engineering_allowance",
+      "five_products_available": false
+    },
+    {
+      "id": "bms_interface",
+      "title": "BMS junction/gateway/interface and configuration accessories",
+      "quantity_basis": "bms_interfaces",
+      "unit_price_eur": {
+        "low": 300.0,
+        "base": 600,
+        "high": 1200
+      },
+      "notes": "Includes required family interface/BJU and setup cable/software allowance; exact kit unresolved.",
+      "price_status": "unresearched_engineering_allowance",
+      "five_products_available": false
+    },
+    {
+      "id": "battery_heater",
+      "title": "Optional pack preheat elements and controller",
+      "quantity_basis": "heaters",
+      "unit_price_eur": {
+        "low": 200.0,
+        "base": 400,
+        "high": 800
+      },
+      "notes": "Zero in current model. Determine cold-weather/ground conditioning strategy.",
+      "price_status": "unresearched_engineering_allowance",
+      "five_products_available": false
+    },
+    {
+      "id": "leak_detection",
+      "title": "Leak/level detection and wiring",
+      "quantity_basis": "loops",
+      "unit_price_eur": {
+        "low": 40.0,
+        "base": 80,
+        "high": 160
+      },
+      "notes": "Exact sensing method and coolant compatibility unresolved.",
+      "price_status": "unresearched_engineering_allowance",
+      "five_products_available": false
+    }
+  ],
+  "default_selection": {
+    "cells": "cells_1",
+    "bms_master": "bms_master_1",
+    "bms_monitor": "bms_monitor_1",
+    "inverter": "inverter_1",
+    "battery_plate": "battery_plate_1",
+    "inverter_plate": "inverter_plate_2",
+    "radiator": "radiator_1",
+    "pump": "pump_1",
+    "fan": "fan_1",
+    "hose": "hose_1",
+    "quick_disconnect": "quick_disconnect_4",
+    "tim": "tim_1",
+    "contactor": "contactor_1",
+    "precharge_relay": "precharge_relay_1",
+    "resistor": "resistor_1",
+    "fuse": "fuse_1",
+    "imd": "imd_1",
+    "hv_connector": "hv_connector_1",
+    "hv_cable": "hv_cable_3",
+    "current_sensor": "current_sensor_5",
+    "voltage_sensor": "voltage_sensor_1",
+    "temperature": "temperature_1",
+    "pressure": "pressure_1",
+    "flow": "flow_1",
+    "dc_dc": "dc_dc_1",
+    "coolant": "coolant_1"
+  },
+  "limitations": [
+    "No item is flight-qualified by this catalogue.",
+    "Budget ranges are author assumptions unless marked published; technical URLs do not substantiate estimated prices.",
+    "Five candidates per researched category; custom allowance categories do not have five verified priced products.",
+    "Changing cell or cooling hardware requires rerunning engineering feasibility."
+  ]
+}

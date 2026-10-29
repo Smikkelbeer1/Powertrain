@@ -16,5 +16,8 @@ albatros = "albatros.cli:main"
 [tool.setuptools]
 packages = ["albatros"]
 
+[tool.setuptools.package-data]
+albatros = ["elct-cost-estimation.json"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]

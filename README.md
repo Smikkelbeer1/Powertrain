@@ -15,6 +15,8 @@ data from the other departments and uses them to size:
 * **cooling**: eight liquid loops (pumps, hoses, radiators, fans), with their mass and volume
 * **checks**: temperatures, SOC reserve, cell current and voltage, bus voltage,
   rotor tip Mach and radiator packaging, shown in a mass and volume budget
+* **cost**: a provisional EUR budget of the powertrain (motors excluded), see
+  [Cost estimation](#cost-estimation-elct)
 
 ## Quick start
 
@@ -57,6 +59,43 @@ motor and cooling mass, and the mass left over for the airframe, change with it.
 The two-rotor emergency is often what limits the flight, via the cell current
 limit. See `cell.emergency_max_current_A`, `aircraft.emergency_on_ground` and
 section 7.5 of [HOW_IT_WORKS.md](HOW_IT_WORKS.md).
+
+## Cost estimation (ELCT)
+
+Every design also gets a provisional cost estimate from
+[`albatros/elct_cost_estimation.py`](albatros/elct_cost_estimation.py). It
+prices the parts with the product catalogue
+[`albatros/elct-cost-estimation.json`](albatros/elct-cost-estimation.json):
+130 candidates in 26 categories, plus 33 custom/assembly allowances.
+**Motors are excluded.** Amounts are EUR excluding VAT, given as low, base and
+high, plus 20 % contingency. Only about 8 % of the base total comes from
+published prices; the rest are our own estimates. Use it to compare designs,
+not as a purchase budget. The reasoning per part is in
+[`docs/cost/component-selection-guide.md`](docs/cost/component-selection-guide.md)
+(spreadsheet version: [`docs/cost/component-catalogue.csv`](docs/cost/component-catalogue.csv)).
+
+```bash
+python -m albatros --mass 750 --cost-config configs/elct_cost_assumptions.json --json out/design.json
+python -m albatros --sweep 600 900 50 --csv out/sweep.csv        # adds cost_low/base/high_eur columns
+python -m albatros.elct_cost_estimation out/design.json --out out/cost.json   # cost a saved design
+```
+
+Quantities follow from the sized design: cells (Ns × Np), BMS boards per
+battery section, cold-plate and TIM area, coolant volume, hose length, and the
+radiator UA. Separate inverters are only costed when
+`inverter.integrated_in_motor` is false. In
+[`configs/elct_cost_assumptions.json`](configs/elct_cost_assumptions.json) you
+can pick other products (by catalogue id), override prices and set counts such
+as contactors and cable length. You cannot override cell or board counts:
+change the design instead.
+
+For an optimiser:
+
+```python
+from albatros.elct_cost_estimation import estimate_cost, optimizer_objective
+cost = estimate_cost(design)["total_eur"]                    # {"low", "base", "high"}
+objective = optimizer_objective(design, allow_provisional=True)  # base EUR, inf if the design has issues
+```
 
 ## Inputs: who provides what
 
@@ -123,10 +162,12 @@ albatros/
   simulation.py    time simulation and limit checks
   sizing.py        run_model(): the complete design procedure
   recovery.py      landing recovery: can we land right after climbing without overheating?
+  elct_cost_estimation.py   provisional cost estimate (catalogue: elct-cost-estimation.json)
   reporting.py     JSON config loading, terminal/CSV/JSON output
   plotting.py      matplotlib plots
   cli.py           command-line interface
-configs/           example input files
+configs/           example input files and cost assumptions
+docs/cost/         component selection guide and catalogue (CSV) behind the cost estimate
 tests/             pytest checks (energy conservation, scaling laws, ...)
 ```
 

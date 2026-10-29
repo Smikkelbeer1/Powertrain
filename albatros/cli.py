@@ -8,6 +8,7 @@ Examples
   python -m albatros --write-config configs/my_inputs.json
   python -m albatros --config configs/my_inputs.json --mass 850 --json out/design.json
   python -m albatros --mass 750 --landing-recovery 600 10 5   overheat check for turn-back landing
+  python -m albatros --mass 750 --cost-config configs/elct_cost_assumptions.json   other cost choices
 """
 from __future__ import annotations
 
@@ -17,9 +18,10 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
+from .elct_cost_estimation import estimate_cost, load_cost_config
 from .recovery import landing_recovery
-from .reporting import (load_inputs, print_design, print_recovery, sweep_row, write_config,
-                        write_csv, write_json)
+from .reporting import (load_inputs, print_cost, print_design, print_recovery, sweep_row,
+                        write_config, write_csv, write_json)
 from .sizing import run_model, sweep_values
 
 
@@ -47,10 +49,22 @@ def build_parser() -> argparse.ArgumentParser:
                         help="After sizing, find the shortest level cruise [s] (0..MAX in STEP) after "
                              "which descent, back-transition and landing stay MARGIN [C] below the "
                              "temperature limits (MAX 0 = turn back right after climb)")
+    parser.add_argument("--cost-config", type=Path,
+                        help="Cost assumptions / product selections JSON (ELCT cost estimation)")
     return parser
 
 
-def run_sweep(x, variable: str, values: list[float]) -> list[dict[str, Any]]:
+def design_cost(design: dict[str, Any], cost_config: dict[str, Any] | None) -> dict[str, Any]:
+    """Cost report of a design. A costing problem (e.g. a part's voltage limit)
+    is reported next to the design instead of discarding the physics result."""
+    try:
+        return estimate_cost(design, cost_config)
+    except ValueError as exc:
+        return {"error": str(exc)}
+
+
+def run_sweep(x, variable: str, values: list[float],
+              cost_config: dict[str, Any] | None = None) -> list[dict[str, Any]]:
     """Run one design per value; failed points keep their error message."""
     summary: list[dict[str, Any]] = []
     for value in values:
@@ -61,7 +75,8 @@ def run_sweep(x, variable: str, values: list[float]) -> list[dict[str, Any]]:
             trial.motor.peak_torque_Nm = value
         print(f"Calculating {variable} = {value:g} ...", flush=True)
         try:
-            row = sweep_row(variable, value, run_model(trial))
+            design = run_model(trial)
+            row = sweep_row(variable, value, design, design_cost(design, cost_config))
         except ValueError as exc:
             row = {variable: value, "error": str(exc)}
         summary.append(row)
@@ -74,6 +89,7 @@ def main(argv: list[str] | None = None) -> None:
     args = parser.parse_args(argv)
     try:
         x = load_inputs(args.config)
+        cost_config = load_cost_config(args.cost_config)
         if args.mass is not None:  # MTOW given on the command line wins
             x.aircraft.mass_kg, x.motor.peak_torque_Nm = args.mass, 0.0
         if args.torque is not None:
@@ -93,15 +109,17 @@ def main(argv: list[str] | None = None) -> None:
             raise ValueError("--landing-recovery works on a single design, not a sweep")
         if args.sweep or args.sweep_torque:
             if args.sweep:
-                data = run_sweep(x, "mass_kg", sweep_values(*args.sweep))
+                data = run_sweep(x, "mass_kg", sweep_values(*args.sweep), cost_config)
             else:
-                data = run_sweep(x, "peak_torque_Nm", sweep_values(*args.sweep_torque))
+                data = run_sweep(x, "peak_torque_Nm", sweep_values(*args.sweep_torque), cost_config)
                 x_key, x_label = "peak_torque_Nm", "Motor peak torque (Nm)"
             if args.csv:
                 write_csv(args.csv, data)
         else:
             data = run_model(x)
+            data["cost_estimation"] = design_cost(data, cost_config)
             print_design(data)
+            print_cost(data["cost_estimation"])
             if args.landing_recovery:
                 data["landing_recovery"] = landing_recovery(x, data, *args.landing_recovery)
                 print_recovery(data["landing_recovery"])
