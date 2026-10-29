@@ -1,0 +1,20 @@
+{
+  "integrated_inverters": null,
+  "inverter_coldplates_included": true,
+  "electrical_islands": 1,
+  "main_contactors": 6,
+  "dc_dc_units": 2,
+  "hv_cable_m": 30,
+  "rotors": 4,
+  "gearboxes": 0,
+  "tilt_actuators": 0,
+  "flight_computers": 0,
+  "labour_hours": 160,
+  "include_ground": true,
+  "include_nre": true,
+  "contingency_fraction": 0.2,
+  "selection": {},
+  "price_overrides_eur": {},
+  "quantity_overrides": {},
+  "strict": false
+}

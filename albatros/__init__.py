@@ -7,6 +7,9 @@ Typical use from Python:
     result = run_model(x)
     print(result["parallel"], result["battery_dry_with_BMS_kg"])
 
+    from albatros.elct_cost_estimation import estimate_cost
+    print(estimate_cost(result)["total_eur"])     # provisional EUR, motors excluded
+
 See README.md for the model description and assumptions.
 """
 from .inputs import Inputs

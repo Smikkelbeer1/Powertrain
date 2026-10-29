@@ -60,9 +60,10 @@ def write_json(path: Path, data: Any) -> None:
     path.write_text(json.dumps(data, indent=2, allow_nan=False) + "\n", encoding="utf-8")
 
 
-def sweep_row(variable: str, value: float, r: dict[str, Any]) -> dict[str, Any]:
-    """Compact one-line summary of a design, used for sweeps."""
-    return {variable: value, "mtow_kg": r["mtow_kg"], "series": r["series"],
+def sweep_row(variable: str, value: float, r: dict[str, Any],
+              cost: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Compact one-line summary of a design (and its cost report), used for sweeps."""
+    row = {variable: value, "mtow_kg": r["mtow_kg"], "series": r["series"],
             "parallel": r["parallel"], "cell_count": r["cell_count"],
             "cruise_min": r["cruise_s"] / 60, "range_km": r["range_km"],
             "battery_cells_kg": r["battery_cells_kg"], "battery_dry_kg": r["battery_dry_with_BMS_kg"],
@@ -77,6 +78,11 @@ def sweep_row(variable: str, value: float, r: dict[str, Any]) -> dict[str, Any]:
             "worst_inverter_C": r["all_case_metrics"]["peak_inverter_C"],
             "worst_battery_C": r["all_case_metrics"]["peak_battery_C"],
             "issues": "; ".join(r["issues"])}
+    if cost is not None:  # provisional EUR, motors excluded (elct_cost_estimation)
+        total = cost.get("total_eur", {})
+        row.update(cost_low_eur=total.get("low"), cost_base_eur=total.get("base"),
+                   cost_high_eur=total.get("high"), cost_error=cost.get("error", ""))
+    return row
 
 
 def print_design(result: dict[str, Any]) -> None:
@@ -155,6 +161,23 @@ def print_design(result: dict[str, Any]) -> None:
     print("MODEL LIMIT EXCEEDANCES:", "; ".join(r["issues"]) or "none under stated assumptions")
     for note in r["warnings"]:
         print("Assumption:", note)
+
+
+def print_cost(cost: dict[str, Any]) -> None:
+    """Short summary of an elct_cost_estimation report."""
+    print("\n-- Cost (provisional, EUR ex VAT, motors excluded) --")
+    if "error" in cost:
+        print("Cost estimate failed:", cost["error"])
+        return
+    t, s = cost["total_eur"], cost["scope_totals_eur"]
+    print(f"Total incl {100 * cost['contingency_fraction']:.0f} % contingency: low {t['low']:,.0f} | "
+          f"base {t['base']:,.0f} | high {t['high']:,.0f}")
+    print("Base by scope: " + " | ".join(f"{k} {v['base']:,.0f}" for k, v in s.items()))
+    top = sorted(cost["rows"], key=lambda row: -row["subtotal_eur"]["base"])[:5]
+    print("Largest base items: " + ", ".join(f"{row['category']} {row['subtotal_eur']['base']:,.0f}"
+                                             for row in top))
+    print(f"Backed by a published price: {100 * cost['published_price_fraction_of_base']:.1f} % of base "
+          f"| {len(cost['unresolved'])} open pricing/qualification items (see JSON output)")
 
 
 def print_recovery(r: dict[str, Any]) -> None:
